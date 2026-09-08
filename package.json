@@ -1,0 +1,37 @@
+{
+  "name": "graphagent-gateway",
+  "version": "1.0.0",
+  "description": "GraphAgent Gateway - Autonomous Web3 AI Agent Gateway integrating The Graph Subgraph Studio, Bazantic x402 Micropayments, and ENSv2 Permissioned Resolvers",
+  "type": "module",
+  "main": "server/index.js",
+  "scripts": {
+    "dev": "concurrently -n \"server,client\" -c \"cyan,green\" \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "node server/index.js",
+    "dev:client": "npm run dev --prefix client",
+    "build": "npm run build --prefix client",
+    "start": "node server/index.js",
+    "install:all": "npm install && npm install --prefix client"
+  },
+  "keywords": [
+    "the-graph",
+    "subgraph-studio",
+    "bazantic",
+    "x402",
+    "mpp",
+    "ensv2",
+    "sepolia",
+    "ai-agent",
+    "eth-online-2026"
+  ],
+  "author": "AgentCorp Engineering",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "viem": "^2.19.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
