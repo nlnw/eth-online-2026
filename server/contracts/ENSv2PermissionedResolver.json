@@ -1,0 +1,88 @@
+{
+  "contractName": "ENSv2PermissionedResolver",
+  "version": "v2.0.0-rc",
+  "network": "sepolia",
+  "chainId": 11155111,
+  "defaultAddress": "0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41",
+  "eacResolverAddress": "0xEac2026000000000000000000000000000000002",
+  "abi": [
+    {
+      "type": "function",
+      "name": "setText",
+      "inputs": [
+        { "name": "node", "type": "bytes32" },
+        { "name": "key", "type": "string" },
+        { "name": "value", "type": "string" }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "text",
+      "inputs": [
+        { "name": "node", "type": "bytes32" },
+        { "name": "key", "type": "string" }
+      ],
+      "outputs": [{ "name": "", "type": "string" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "isAuthorized",
+      "inputs": [
+        { "name": "node", "type": "bytes32" },
+        { "name": "caller", "type": "address" }
+      ],
+      "outputs": [{ "name": "", "type": "bool" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "setAuthorisation",
+      "inputs": [
+        { "name": "node", "type": "bytes32" },
+        { "name": "target", "type": "address" },
+        { "name": "isAuthorised", "type": "bool" }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "owner",
+      "inputs": [{ "name": "node", "type": "bytes32" }],
+      "outputs": [{ "name": "", "type": "address" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "supportsInterface",
+      "inputs": [{ "name": "interfaceID", "type": "bytes4" }],
+      "outputs": [{ "name": "", "type": "bool" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "event",
+      "name": "TextChanged",
+      "inputs": [
+        { "name": "node", "type": "bytes32", "indexed": true },
+        { "name": "indexedKey", "type": "string", "indexed": true },
+        { "name": "key", "type": "string", "indexed": false },
+        { "name": "value", "type": "string", "indexed": false }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "AuthorisationChanged",
+      "inputs": [
+        { "name": "node", "type": "bytes32", "indexed": true },
+        { "name": "owner", "type": "address", "indexed": true },
+        { "name": "target", "type": "address", "indexed": true },
+        { "name": "isAuthorised", "type": "bool", "indexed": false }
+      ],
+      "anonymous": false
+    }
+  ]
+}
