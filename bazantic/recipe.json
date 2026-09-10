@@ -1,0 +1,107 @@
+{
+  "$schema": "https://bazantic.io/schemas/v1/recipe.json",
+  "name": "graphagent-liquidity-attestation-recipe",
+  "version": "1.0.0",
+  "description": "Bazantic Recipe for autonomous liquidity auditing via The Graph Subgraph Studio, settled via x402 micropayments, and attested to ENSv2 Permissioned Resolvers",
+  "author": "oracle.agentcorp.eth",
+  "trigger": {
+    "type": "on_demand",
+    "http": {
+      "path": "/api/run-audit",
+      "method": "POST"
+    },
+    "interval_fallback_seconds": 30
+  },
+  "payment": {
+    "protocol": "x402",
+    "facilitator": "0x4020000000000000000000000000000000000001",
+    "recipient": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+    "amount": "0.001",
+    "asset": "ETH",
+    "network": "sepolia",
+    "chainId": 11155111,
+    "headerName": "Authorization",
+    "tokenPrefix": "Bearer bazantic_mpp_"
+  },
+  "steps": [
+    {
+      "step": 1,
+      "id": "ingest_gateway_credentials",
+      "name": "Ingest and Verify Gateway Credentials",
+      "action": "auth.validate_x402_bearer",
+      "parameters": {
+        "header": "Authorization",
+        "expectedPrefix": "Bearer bazantic_mpp_",
+        "challengeOnMissing": true,
+        "challengeCode": 402,
+        "challengeMetadata": {
+          "scheme": "x402",
+          "realm": "bazantic-mpp-gateway",
+          "price": "0.001 ETH",
+          "facilitator": "0x4020000000000000000000000000000000000001"
+        }
+      },
+      "outputs": [
+        "gateway_session_id",
+        "payer_address",
+        "auth_verified"
+      ]
+    },
+    {
+      "step": 2,
+      "id": "fetch_subgraph_liquidity",
+      "name": "Fetch and Parse Subgraph Studio Liquidity Data",
+      "action": "thegraph.subgraph_studio_query",
+      "parameters": {
+        "subgraphId": "uniswap/uniswap-v3",
+        "endpoint": "${env.THE_GRAPH_SUBGRAPH_URL}",
+        "apiKey": "${env.THE_GRAPH_API_KEY}",
+        "query": "query GetTopPools($first: Int!) { pools(first: $first, orderBy: totalValueLockedUSD, orderDirection: desc) { id token0 { symbol name decimals } token1 { symbol name decimals } feeTier liquidity sqrtPrice tick totalValueLockedUSD volumeUSD txCount } bundle(id: \"1\") { ethPriceUSD } }",
+        "variables": {
+          "first": 5
+        },
+        "deterministicHash": "keccak256",
+        "computeRiskProfile": true
+      },
+      "outputs": [
+        "pools",
+        "totalTvlUSD",
+        "total24hVolumeUSD",
+        "liquidityScore",
+        "riskProfile",
+        "reportHash"
+      ]
+    },
+    {
+      "step": 3,
+      "id": "ensv2_attestation_write",
+      "name": "Verify and Write ENSv2 Permissioned Attestation",
+      "action": "ens.write_permissioned_text_record",
+      "parameters": {
+        "network": "sepolia",
+        "chainId": 11155111,
+        "subname": "oracle.agentcorp.eth",
+        "resolver": "0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41",
+        "recordKey": "records['last_audit_hash']",
+        "recordValue": "${steps.fetch_subgraph_liquidity.outputs.reportHash}",
+        "eacVerification": true,
+        "fallbackSimulation": true
+      },
+      "outputs": [
+        "txHash",
+        "node",
+        "blockNumber",
+        "calldata",
+        "attestationStatus"
+      ]
+    }
+  ],
+  "verification": {
+    "policy": "strict_integrity",
+    "on_chain_validation": {
+      "contract": "0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41",
+      "method": "text(bytes32,string)",
+      "expectedValue": "${steps.fetch_subgraph_liquidity.outputs.reportHash}"
+    }
+  }
+}
