@@ -1,0 +1,17 @@
+{
+  "name": "graphagent-gateway-server",
+  "version": "1.0.0",
+  "description": "Backend execution gateway for GraphAgent: Bazantic x402, Subgraph Studio GraphQL, and ENSv2 Sepolia attestation",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node index.js",
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "viem": "^2.19.0"
+  }
+}
