@@ -1,0 +1,9 @@
+recordings/
+*.mp4
+*.webm
+*.cast
+docs/
+tests/
+scripts/record*
+scripts/generate_voiceover*
+scripts/mux*

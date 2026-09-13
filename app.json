@@ -1,0 +1,49 @@
+{
+  "name": "Sentinel402 Gateway",
+  "description": "Autonomous Web3 AI Agent Sentinel integrating The Graph Subgraph Studio, Bazantic x402 Micropayments, and ENSv2 Permissioned Resolvers",
+  "repository": "https://github.com/nlnw/eth-online-2026",
+  "keywords": [
+    "web3",
+    "ai-agent",
+    "the-graph",
+    "x402",
+    "ensv2",
+    "sepolia",
+    "erc402"
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "env": {
+    "SEPOLIA_RPC_URL": {
+      "description": "Ethereum Sepolia RPC endpoint URL",
+      "value": "https://rpc.ankr.com/eth_sepolia",
+      "required": true
+    },
+    "ENS_AGENT_SUBNAME": {
+      "description": "ENSv2 Subname assigned to this agent",
+      "value": "auditor.sentinel402.eth",
+      "required": false
+    },
+    "ENS_RESOLVER_ADDRESS": {
+      "description": "ENSv2 Permissioned Resolver contract address on Sepolia",
+      "value": "0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41",
+      "required": false
+    },
+    "X402_FACILITATOR_ADDRESS": {
+      "description": "Bazantic x402 facilitator address",
+      "value": "0x4020000000000000000000000000000000000001",
+      "required": false
+    },
+    "GRAPH_STUDIO_API_KEY": {
+      "description": "The Graph Subgraph Studio API Key (optional for public endpoints)",
+      "required": false
+    },
+    "AGENT_PRIVATE_KEY": {
+      "description": "Hex-encoded Sepolia private key (0x...) for on-chain ENS attestation writes (deterministic simulation mode active if omitted or unfunded)",
+      "required": false
+    }
+  }
+}

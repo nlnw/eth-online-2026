@@ -356,15 +356,18 @@ app.post('/api/run-audit', async (req, res) => {
   }
 });
 
-// Serve static frontend build if present (for single-container production deploys)
+// Serve static frontend build if present (for single-container production deploys like Heroku/Render)
 const clientDist = join(__dirname, '../client/dist');
-if (existsSync(clientDist)) {
-  app.use(express.static(clientDist));
-  app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api')) return next();
-    res.sendFile(join(clientDist, 'index.html'));
-  });
-}
+app.use(express.static(clientDist));
+
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api')) return next();
+  const indexPath = join(clientDist, 'index.html');
+  if (existsSync(indexPath)) {
+    return res.sendFile(indexPath);
+  }
+  res.status(404).send('Sentinel402 Gateway API is running. Client build not found. Run npm run build.');
+});
 
 app.listen(PORT, HOST, () => {
   console.log(`[Sentinel402 Gateway] Server listening on http://${HOST}:${PORT}`);

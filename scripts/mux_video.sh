@@ -11,16 +11,13 @@ if ! command -v ffmpeg &> /dev/null; then
   exit 1
 fi
 
-VIDEO_INPUT="${1}"
+VIDEO_INPUT="${1:-recordings/sentinel402_screen_demo.webm}"
 AUDIO_INPUT="${2:-recordings/demo_voiceover.mp3}"
 OUTPUT_FILE="${3:-recordings/sentinel402_demo_submission.mp4}"
 
-if [ -z "$VIDEO_INPUT" ]; then
-  echo "Usage: $0 <screen_recording.webm|mp4> [voiceover.mp3] [output.mp4]"
-  echo ""
-  echo "Example:"
-  echo "  $0 recordings/my_screen_capture.webm"
-  echo "  $0 screen.mp4 recordings/demo_voiceover.mp3 recordings/final_demo.mp4"
+if [ ! -f "$VIDEO_INPUT" ]; then
+  echo "[Error] Video file not found: $VIDEO_INPUT"
+  echo "Usage: $0 [screen_recording.webm|mp4] [voiceover.mp3] [output.mp4]"
   exit 1
 fi
 
@@ -51,12 +48,12 @@ mkdir -p "$(dirname "$OUTPUT_FILE")"
 # - Audio encoded with MP3 (libmp3lame at 192kbps) for universal playback including VSCode
 # - EBU R128 loudness normalization for broadcast-quality speech levels
 # - Faststart flag enabled for smooth web streaming
-# - Burn in subtitles using Inter modern font with light black border stroke (Fontsize 20, Outline 1.0)
+# - Burn in subtitles using Inter modern font (Fontsize 30, 1.5x scale, centered with margins and light border)
 VF_ARGS=()
 if [ -f "recordings/demo_voiceover.vtt" ]; then
   FONTS_DIR="$(pwd)/recordings/fonts"
-  VF_ARGS=(-vf "subtitles=recordings/demo_voiceover.vtt:fontsdir=${FONTS_DIR}:force_style='PlayResX=1440,PlayResY=810,Fontname=Inter,Fontsize=20,Bold=1,PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,BorderStyle=1,Outline=1.0,Shadow=0.8,BackColour=&H60000000,MarginV=14,Alignment=2'")
-  echo " Subtitles   : recordings/demo_voiceover.vtt (Burned in with Inter font & light border stroke)"
+  VF_ARGS=(-vf "subtitles=recordings/demo_voiceover.vtt:fontsdir=${FONTS_DIR}:force_style='PlayResX=1440,PlayResY=810,Fontname=Inter,Fontsize=30,Bold=1,PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,BorderStyle=1,Outline=1.4,Shadow=1.0,BackColour=&H60000000,MarginV=18,MarginL=140,MarginR=140,Alignment=2,WrapStyle=0'")
+  echo " Subtitles   : recordings/demo_voiceover.vtt (Burned in with Inter font, Fontsize=30, centered wrap & light border)"
 fi
 
 ffmpeg -y \

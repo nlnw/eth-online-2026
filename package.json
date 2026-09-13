@@ -8,7 +8,8 @@
     "dev": "concurrently -n \"server,client\" -c \"cyan,green\" \"npm run dev:server\" \"npm run dev:client\"",
     "dev:server": "node server/index.js",
     "dev:client": "npm run dev --prefix client",
-    "build": "npm --prefix client install && npm --prefix client run build",
+    "build": "npm --prefix client install --include=dev && npm --prefix client run build",
+    "heroku-postbuild": "npm --prefix client install --include=dev && npm --prefix client run build",
     "record": "bash scripts/record.sh",
     "record:browser": "LD_LIBRARY_PATH=\"$HOME/.local/share/mamba/envs/browser-libs/lib:$LD_LIBRARY_PATH\" node scripts/record_browser_demo.js",
     "play": "uvx asciinema play recordings/demo.cast",
@@ -18,6 +19,10 @@
     "mux": "bash scripts/mux_video.sh",
     "start": "node server/index.js",
     "install:all": "npm install && npm install --prefix client"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
   },
   "keywords": [
     "the-graph",

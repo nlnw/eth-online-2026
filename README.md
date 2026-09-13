@@ -143,6 +143,36 @@ npm run generate-wallet
 
 ---
 
+## Hosting & Deployment (Heroku / PaaS)
+
+The repository is configured for zero-config, single-container deployment on Heroku, Railway, or Render. Express automatically serves both the API endpoints (`/api/*`) and compiles/serves the static React frontend from `client/dist/`.
+
+### Deploy to Heroku via CLI
+
+```bash
+# 1. Login and create a new Heroku app
+heroku login
+heroku create sentinel402-gateway
+
+# 2. Configure environment variables (defaults match Sepolia testnet)
+heroku config:set SEPOLIA_RPC_URL="https://rpc.ankr.com/eth_sepolia"
+heroku config:set ENS_AGENT_SUBNAME="auditor.sentinel402.eth"
+heroku config:set ENS_RESOLVER_ADDRESS="0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41"
+heroku config:set X402_FACILITATOR_ADDRESS="0x4020000000000000000000000000000000000001"
+
+# 3. Deploy via git
+git push heroku main
+
+# 4. Open the live app
+heroku open
+```
+
+### 1-Click Heroku Button
+The repository includes an [`app.json`](./app.json) manifest. You can deploy directly via:
+`https://heroku.com/deploy?template=https://github.com/nlnw/eth-online-2026`
+
+---
+
 ## Targeted Hackathon Tracks
 
 | Track | Category | Integration Summary |
