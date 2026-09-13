@@ -61,7 +61,8 @@ NARRATION_SECTIONS = [
 async def generate_audio():
     import edge_tts
 
-    voice = os.getenv("TTS_VOICE", "en-US-ChristopherNeural")
+    voice = os.getenv("TTS_VOICE", "en-US-AndrewMultilingualNeural")
+    rate = os.getenv("TTS_RATE", "+14%")
     output_dir = Path(__file__).resolve().parent.parent / "recordings"
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -69,11 +70,11 @@ async def generate_audio():
     vtt_path = output_dir / "demo_voiceover.vtt"
 
     full_text = "\n\n".join(text for _, text in NARRATION_SECTIONS)
-    print(f"[TTS] Generating voiceover using voice: {voice}")
+    print(f"[TTS] Generating natural voiceover using voice: {voice} at {rate}")
     print(f"[TTS] Destination: {mp3_path}")
 
     # Generate audio and subtitles in single stream
-    communicate = edge_tts.Communicate(full_text, voice, rate="+2%", volume="+0%")
+    communicate = edge_tts.Communicate(full_text, voice, rate=rate, volume="+0%")
     sub_maker = edge_tts.SubMaker()
     with open(str(mp3_path), "wb") as file:
         async for chunk in communicate.stream():

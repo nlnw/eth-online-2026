@@ -5,7 +5,7 @@ export default function TerminalLog({ logs, onClearLogs, isExecuting, onExportLo
   const terminalEndRef = useRef(null);
 
   useEffect(() => {
-    if (terminalEndRef.current) {
+    if (terminalEndRef.current && logs.length > 0) {
       terminalEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }, [logs]);

@@ -307,7 +307,7 @@ export default function App() {
         onSetTheme={setThemeMode}
       />
 
-      <main className="w-full px-4 sm:px-6 py-5 space-y-4 flex-1">
+      <main className="max-w-6xl mx-auto w-full px-6 sm:px-10 py-6 space-y-6 flex-1">
         {/* Minimal Hero / Spec Overview */}
         <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-md p-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -464,7 +464,7 @@ export default function App() {
 
       {/* Footer */}
       <footer className="border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 py-3 px-4 text-xs font-mono text-zinc-500 transition-colors">
-        <div className="w-full px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div className="max-w-6xl mx-auto px-6 sm:px-10 flex flex-col sm:flex-row items-center justify-between gap-2">
           <span>Sentinel402 Gateway • ETHOnline 2026</span>
           <div className="flex items-center gap-3 text-zinc-400">
             <span>The Graph Studio</span>

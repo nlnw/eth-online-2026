@@ -48,23 +48,23 @@ mkdir -p "$(dirname "$OUTPUT_FILE")"
 
 # Execute FFmpeg muxing:
 # - Re-encode video to H.264 (YUV420p, CRF 18 for pristine visual fidelity)
-# - Audio encoded with AAC at 192kbps
+# - Audio encoded with MP3 (libmp3lame at 192kbps) for universal playback including VSCode
 # - EBU R128 loudness normalization for broadcast-quality speech levels
 # - Faststart flag enabled for smooth web streaming
-# Check for matching subtitle file
-SUB_ARGS=()
+# - Burn in subtitles using Inter modern font with crisp black border stroke, positioned close to bottom
+VF_ARGS=()
 if [ -f "recordings/demo_voiceover.vtt" ]; then
-  SUB_ARGS=(-i "recordings/demo_voiceover.vtt" -c:s mov_text -metadata:s:s:0 language=eng)
-  echo " Subtitles   : recordings/demo_voiceover.vtt (Embedded as soft captions)"
+  FONTS_DIR="$(pwd)/recordings/fonts"
+  VF_ARGS=(-vf "subtitles=recordings/demo_voiceover.vtt:fontsdir=${FONTS_DIR}:force_style='PlayResX=1440,PlayResY=810,Fontname=Inter,Fontsize=15,Bold=1,PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,BorderStyle=1,Outline=2.4,Shadow=1,BackColour=&H80000000,MarginV=14,Alignment=2'")
+  echo " Subtitles   : recordings/demo_voiceover.vtt (Burned in with Inter font & black border stroke)"
 fi
 
 ffmpeg -y \
   -i "$VIDEO_INPUT" \
   -i "$AUDIO_INPUT" \
-  "${SUB_ARGS[@]}" \
   -map 0:v:0 \
   -map 1:a:0 \
-  $([ ${#SUB_ARGS[@]} -gt 0 ] && echo "-map 2:s:0") \
+  "${VF_ARGS[@]}" \
   -c:v libx264 \
   -preset medium \
   -crf 18 \
