@@ -10,6 +10,7 @@
     "dev:client": "npm run dev --prefix client",
     "build": "npm run build --prefix client",
     "record": "bash scripts/record.sh",
+    "record:browser": "node scripts/record_browser_demo.js",
     "play": "uvx asciinema play recordings/demo.cast",
     "generate-wallet": "node scripts/generate_wallet.js",
     "mcp": "node scripts/mcp_server.js",
@@ -38,6 +39,7 @@
     "viem": "^2.19.0"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "playwright": "^1.63.0"
   }
 }
