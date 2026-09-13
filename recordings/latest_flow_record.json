@@ -1,9 +1,9 @@
 {
   "metadata": {
     "title": "GraphAgent Gateway Audit & Attestation Flow Record",
-    "recordedAt": "2026-09-13T00:30:40.395Z",
+    "recordedAt": "2026-09-13T00:31:08.248Z",
     "environment": "Ethereum Sepolia Testnet",
-    "totalDurationMs": 161,
+    "totalDurationMs": 165,
     "agentSubname": "oracle.agentcorp.eth",
     "facilitator": "0x4020000000000000000000000000000000000001",
     "resolverAddress": "0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41"
@@ -22,7 +22,7 @@
       "name": "Gateway Health & Identity Handshake",
       "endpoint": "GET /api/health",
       "status": 200,
-      "durationMs": 71,
+      "durationMs": 80,
       "output": {
         "status": "online",
         "service": "GraphAgent Gateway",
@@ -32,7 +32,7 @@
         "network": "Ethereum Sepolia (Chain ID: 11155111)",
         "resolverAddress": "0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41",
         "bazanticFacilitator": "0x4020000000000000000000000000000000000001",
-        "timestamp": "2026-09-13T00:30:40.296Z"
+        "timestamp": "2026-09-13T00:31:08.156Z"
       }
     },
     {
@@ -40,7 +40,7 @@
       "name": "x402 Micropayment Challenge Enforcement",
       "endpoint": "POST /api/run-audit (No Auth)",
       "status": 402,
-      "durationMs": 10,
+      "durationMs": 13,
       "wwwAuthenticateHeader": "x402 realm=\"bazantic-mpp-gateway\", price=\"0.001 ETH\", facilitator=\"0x4020000000000000000000000000000000000001\"",
       "challenge": {
         "scheme": "x402",
@@ -52,7 +52,7 @@
         "asset": "ETH",
         "network": "sepolia",
         "chainId": 11155111,
-        "nonce": "mpp_nonce_1789259440317_swh4em0",
+        "nonce": "mpp_nonce_1789259468178_axs37ly",
         "pricingTier": "audit-compute-standard",
         "requiredHeader": "Authorization: Bearer bazantic_mpp_<token>",
         "description": "Bazantic Micropayment Required: 0.001 ETH to execute live Subgraph Studio indexing & ENSv2 Sepolia attestation write"
@@ -63,7 +63,7 @@
       "name": "The Graph Indexing & Deterministic keccak256 Audit",
       "endpoint": "POST /api/run-audit (Bearer Authenticated)",
       "status": 200,
-      "durationMs": 47,
+      "durationMs": 35,
       "graphSource": "The Graph Subgraph Studio (Verified Snapshot Cache)",
       "isGraphLive": false,
       "poolCount": 5,
@@ -77,8 +77,8 @@
       "resolverAddress": "0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41",
       "recordKey": "records['last_audit_hash']",
       "recordValue": "0x5714ee2cba64252ef656f2194363d477cb94841d3e14a2daa1260782624aa726",
-      "txHash": "0x91d5ff2f2b234e319d33674d8d5ef0ddb34e39371c4ee83cb45bf8b77f53d7c5",
-      "blockNumber": 6654124,
+      "txHash": "0xfe1841a4c82553afcb38e65c322ebfd6a2236b458ec37c0a0e2554131f77a443",
+      "blockNumber": 6654340,
       "isSimulated": true
     },
     {
@@ -86,7 +86,7 @@
       "name": "ENSv2 Resolver Record Verification",
       "endpoint": "GET /api/agent-profile",
       "status": 200,
-      "durationMs": 4,
+      "durationMs": 3,
       "recordVerified": true,
       "attestedHash": "0x5714ee2cba64252ef656f2194363d477cb94841d3e14a2daa1260782624aa726"
     }
