@@ -161,7 +161,7 @@ app.get('/api/challenge', (req, res) => {
  * Model Context Protocol (MCP) JSON-RPC Endpoint for AI Agents
  */
 app.post('/api/mcp', async (req, res) => {
-  const { jsonrpc, id, method, params } = req.body || {};
+  const { id, method, params } = req.body || {};
 
   if (method === 'initialize') {
     return res.json({

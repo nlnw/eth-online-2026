@@ -1,3 +1,6 @@
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import {
   createPublicClient,
   createWalletClient,
@@ -11,7 +14,12 @@ import {
 } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { sepolia } from 'viem/chains';
-import resolverMeta from '../contracts/ENSv2PermissionedResolver.json' with { type: 'json' };
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const resolverMeta = JSON.parse(
+  readFileSync(join(__dirname, '../contracts/ENSv2PermissionedResolver.json'), 'utf8')
+);
 
 const RECORD_KEY = "records['last_audit_hash']";
 const DEFAULT_SUBNAME = "auditor.sentinel402.eth";

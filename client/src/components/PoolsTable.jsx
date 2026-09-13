@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ExternalLink, Copy, Check } from 'lucide-react';
 
 export default function PoolsTable({ pools, isLive }) {

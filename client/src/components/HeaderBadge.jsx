@@ -1,39 +1,12 @@
-import React, { useState } from 'react';
-import { Shield, Sun, Moon, Copy, Check, FileCode, CheckCircle } from 'lucide-react';
+import { Sun, Moon, FileCode } from 'lucide-react';
 
 export default function HeaderBadge({
   agentName,
-  resolverAddress,
-  agentAddress,
-  wallet,
-  facilitatorAddress,
   onOpenRecipe,
   theme,
   onToggleTheme,
   onSetTheme
 }) {
-  const [copiedResolver, setCopiedResolver] = useState(false);
-  const [copiedAgent, setCopiedAgent] = useState(false);
-
-  const copyResolver = () => {
-    if (!resolverAddress) return;
-    navigator.clipboard.writeText(resolverAddress);
-    setCopiedResolver(true);
-    setTimeout(() => setCopiedResolver(false), 1500);
-  };
-
-  const copyAgent = () => {
-    const addr = agentAddress || wallet?.address;
-    if (!addr) return;
-    navigator.clipboard.writeText(addr);
-    setCopiedAgent(true);
-    setTimeout(() => setCopiedAgent(false), 1500);
-  };
-
-  const isFunded = wallet?.isFunded || false;
-  const balanceEth = wallet?.balanceEth || '0.0000';
-  const displayAddress = agentAddress || wallet?.address || '0x6BB8f6Ca13DfC7f83E568E1080A66bFd81a6aC5f';
-
   return (
     <header className="border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 sticky top-0 z-40 transition-colors">
       <div className="w-full px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
@@ -55,7 +28,7 @@ export default function HeaderBadge({
         {/* Center: Agent identity subname */}
         <div className="hidden md:flex items-center gap-2 text-xs font-mono">
           <div className="flex items-center gap-2 px-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50 text-zinc-700 dark:text-zinc-300">
-            <span className={`w-2 h-2 rounded-full ${isFunded ? 'bg-emerald-500' : 'bg-emerald-500'}`} />
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
             <span className="text-zinc-500 dark:text-zinc-400">Subname:</span>
             <span className="font-semibold text-zinc-900 dark:text-zinc-100">
               {agentName || 'auditor.sentinel402.eth'}
@@ -66,7 +39,6 @@ export default function HeaderBadge({
 
         {/* Right: Controls & Theme Toggle */}
         <div className="flex items-center gap-2.5 text-xs">
-
           <button
             onClick={onOpenRecipe}
             className="flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition text-xs font-mono"

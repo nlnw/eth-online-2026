@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Play, PlayCircle, Download, Check, Shield } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Play, PlayCircle, Download } from 'lucide-react';
 import HeaderBadge from './components/HeaderBadge';
 import TerminalLog from './components/TerminalLog';
 import PoolsTable from './components/PoolsTable';
@@ -262,7 +262,7 @@ export default function App() {
     await new Promise((r) => setTimeout(r, 600));
     addLog('GATEWAY', 'Step 2: Passing Bazantic MPP session credentials to unlock pipeline...', 'info');
     setAuthMode('authorized');
-    const res = await runAuditPipeline('authorized', true);
+    await runAuditPipeline('authorized', true);
 
     addLog('GATEWAY', 'Automated flow complete. Execution record generated.', 'success');
     setIsAutoRunning(false);

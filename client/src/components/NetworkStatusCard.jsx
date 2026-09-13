@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Wallet, Shield, Database, Copy, Check, ExternalLink, RefreshCw, Key } from 'lucide-react';
+import { useState } from 'react';
+import { Copy, Check, ExternalLink, RefreshCw, Key } from 'lucide-react';
 
-export default function NetworkStatusCard({ agentProfile, onRefresh, lastResult }) {
+export default function NetworkStatusCard({ agentProfile, onRefresh }) {
   const [copiedKey, setCopiedKey] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 

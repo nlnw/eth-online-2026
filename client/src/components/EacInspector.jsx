@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { ShieldCheck, Copy, Check, ChevronDown, ChevronUp, Code2, ExternalLink } from 'lucide-react';
+import { useState } from 'react';
+import { ShieldCheck, Copy, Check, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
 
 export default function EacInspector({ attestationData, agentName, resolverAddress }) {
   const [isOpen, setIsOpen] = useState(false);

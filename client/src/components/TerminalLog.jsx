@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import { Terminal, Trash2, Download } from 'lucide-react';
 
 export default function TerminalLog({ logs, onClearLogs, isExecuting, onExportLogs }) {

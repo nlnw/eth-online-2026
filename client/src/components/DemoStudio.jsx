@@ -1,11 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Video, VideoOff, Play, RotateCcw, Download, BookOpen, Check, AlertCircle, ChevronRight, X } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Video, VideoOff, Play, BookOpen, ChevronRight, X } from 'lucide-react';
 
 export default function DemoStudio({
   onRunAutoFlow,
   isExecuting,
-  recordedRun,
-  onReplayRun,
   isReplaying
 }) {
   const [isRecordingVideo, setIsRecordingVideo] = useState(false);
