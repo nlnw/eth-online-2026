@@ -51,12 +51,12 @@ mkdir -p "$(dirname "$OUTPUT_FILE")"
 # - Audio encoded with MP3 (libmp3lame at 192kbps) for universal playback including VSCode
 # - EBU R128 loudness normalization for broadcast-quality speech levels
 # - Faststart flag enabled for smooth web streaming
-# - Burn in subtitles using Inter modern font with crisp black border stroke, positioned close to bottom
+# - Burn in subtitles using Inter modern font with light black border stroke (Fontsize 20, Outline 1.0)
 VF_ARGS=()
 if [ -f "recordings/demo_voiceover.vtt" ]; then
   FONTS_DIR="$(pwd)/recordings/fonts"
-  VF_ARGS=(-vf "subtitles=recordings/demo_voiceover.vtt:fontsdir=${FONTS_DIR}:force_style='PlayResX=1440,PlayResY=810,Fontname=Inter,Fontsize=15,Bold=1,PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,BorderStyle=1,Outline=2.4,Shadow=1,BackColour=&H80000000,MarginV=14,Alignment=2'")
-  echo " Subtitles   : recordings/demo_voiceover.vtt (Burned in with Inter font & black border stroke)"
+  VF_ARGS=(-vf "subtitles=recordings/demo_voiceover.vtt:fontsdir=${FONTS_DIR}:force_style='PlayResX=1440,PlayResY=810,Fontname=Inter,Fontsize=20,Bold=1,PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,BorderStyle=1,Outline=1.0,Shadow=0.8,BackColour=&H60000000,MarginV=14,Alignment=2'")
+  echo " Subtitles   : recordings/demo_voiceover.vtt (Burned in with Inter font & light border stroke)"
 fi
 
 ffmpeg -y \

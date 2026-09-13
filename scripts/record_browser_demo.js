@@ -525,14 +525,11 @@ async function run() {
       stdio: 'inherit'
     });
 
-    // Clean up intermediate raw webm video files and temporary directory
+    // Clean up internal playwright video temp directory, but KEEP sentinel402_screen_demo.webm for fast remuxing!
     if (fs.existsSync(VIDEO_DIR)) {
       fs.rmSync(VIDEO_DIR, { recursive: true, force: true });
     }
-    if (fs.existsSync(targetVideoPath)) {
-      fs.unlinkSync(targetVideoPath);
-    }
-    console.log('[Cleanup] Removed raw intermediate webm video captures.');
+    console.log(`[Cache] Preserved raw webm screen capture at: ${targetVideoPath}`);
 
     console.log(`\n🎉 SUBMISSION VIDEO READY: ${finalOutputPath}`);
   } else {

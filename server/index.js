@@ -3,7 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import { fetchSubgraphLiquidity } from './src/graph.js';
 import { writeAuditAttestation, readAuditAttestation, getAgentWalletStatus } from './src/ens.js';
 
@@ -355,6 +355,16 @@ app.post('/api/run-audit', async (req, res) => {
     });
   }
 });
+
+// Serve static frontend build if present (for single-container production deploys)
+const clientDist = join(__dirname, '../client/dist');
+if (existsSync(clientDist)) {
+  app.use(express.static(clientDist));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) return next();
+    res.sendFile(join(clientDist, 'index.html'));
+  });
+}
 
 app.listen(PORT, HOST, () => {
   console.log(`[Sentinel402 Gateway] Server listening on http://${HOST}:${PORT}`);

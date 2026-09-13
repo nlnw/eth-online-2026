@@ -8,7 +8,7 @@
     "dev": "concurrently -n \"server,client\" -c \"cyan,green\" \"npm run dev:server\" \"npm run dev:client\"",
     "dev:server": "node server/index.js",
     "dev:client": "npm run dev --prefix client",
-    "build": "npm run build --prefix client",
+    "build": "npm --prefix client install && npm --prefix client run build",
     "record": "bash scripts/record.sh",
     "record:browser": "LD_LIBRARY_PATH=\"$HOME/.local/share/mamba/envs/browser-libs/lib:$LD_LIBRARY_PATH\" node scripts/record_browser_demo.js",
     "play": "uvx asciinema play recordings/demo.cast",
