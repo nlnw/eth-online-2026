@@ -7,9 +7,15 @@
   },
   "ens": {
     "subname": "oracle.agentcorp.eth",
+    "agentAddress": "0x6BB8f6Ca13DfC7f83E568E1080A66bFd81a6aC5f",
     "defaultResolver": "0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41",
     "recordKey": "records['last_audit_hash']",
-    "defaultRpc": "https://ethereum-sepolia-rpc.publicnode.com"
+    "defaultRpc": "https://ethereum-sepolia-rpc.publicnode.com",
+    "faucets": [
+      "https://cloud.google.com/application/web3/faucet/ethereum/sepolia",
+      "https://www.alchemy.com/faucets/ethereum-sepolia",
+      "https://sepolia-faucet.pk910.de/"
+    ]
   },
   "bazantic": {
     "protocol": "x402",

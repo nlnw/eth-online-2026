@@ -32,10 +32,63 @@ export function getSepoliaPublicClient() {
 }
 
 /**
+ * Derives the agent account from configured private key if available
+ */
+export function getAgentAccount() {
+  const privateKey = process.env.AGENT_PRIVATE_KEY;
+  if (privateKey && privateKey.startsWith('0x') && privateKey.length === 66) {
+    try {
+      return privateKeyToAccount(privateKey);
+    } catch (_err) {
+      return null;
+    }
+  }
+  return null;
+}
+
+/**
+ * Check live Sepolia on-chain balance and status for the agent wallet
+ */
+export async function getAgentWalletStatus() {
+  const account = getAgentAccount();
+  if (!account) {
+    return {
+      hasKey: false,
+      address: null,
+      balanceEth: '0.0000',
+      balanceWei: '0',
+      isFunded: false
+    };
+  }
+
+  try {
+    const client = getSepoliaPublicClient();
+    const balance = await client.getBalance({ address: account.address });
+    const ethFormatted = (Number(balance) / 1e18).toFixed(4);
+    return {
+      hasKey: true,
+      address: account.address,
+      balanceEth: ethFormatted,
+      balanceWei: balance.toString(),
+      isFunded: balance > 0n
+    };
+  } catch (err) {
+    return {
+      hasKey: true,
+      address: account.address,
+      balanceEth: '0.0000',
+      balanceWei: '0',
+      isFunded: false,
+      error: err.message
+    };
+  }
+}
+
+/**
  * Interacts with ENSv2 Permissioned Resolver on Ethereum Sepolia
  * Writes `records['last_audit_hash']` for `oracle.agentcorp.eth`
  * 
- * Provides automated fallback / simulation mode if RPC or keys are not populated
+ * Provides automated fallback / simulation mode if RPC or keys are not funded
  * so tests and demo workflows never crash.
  */
 export async function writeAuditAttestation(options = {}) {
@@ -57,44 +110,57 @@ export async function writeAuditAttestation(options = {}) {
     args: [node, RECORD_KEY, reportHash]
   });
 
+  let agentAddress = null;
+
   // Attempt live Sepolia on-chain broadcast if valid private key is present
   if (privateKey && privateKey.startsWith('0x') && privateKey.length === 66) {
     try {
       const account = privateKeyToAccount(privateKey);
-      const walletClient = createWalletClient({
-        account,
-        chain: sepolia,
-        transport: http(process.env.SEPOLIA_RPC_URL || 'https://rpc.sepolia.org')
-      });
+      agentAddress = account.address;
 
-      const txHash = await walletClient.sendTransaction({
-        to: resolverAddress,
-        data: calldata
-      });
+      const publicClient = getSepoliaPublicClient();
+      const balance = await publicClient.getBalance({ address: account.address });
 
-      // Update in-memory cache
-      inMemoryRecordCache.set(`${subname}:${RECORD_KEY}`, {
-        value: reportHash,
-        txHash,
-        node,
-        timestamp: new Date().toISOString(),
-        isSimulated: false
-      });
+      // If key is funded with Sepolia ETH, broadcast live on-chain!
+      if (balance > 0n) {
+        const walletClient = createWalletClient({
+          account,
+          chain: sepolia,
+          transport: http(process.env.SEPOLIA_RPC_URL || 'https://ethereum-sepolia-rpc.publicnode.com')
+        });
 
-      return {
-        success: true,
-        subname,
-        node,
-        recordKey: RECORD_KEY,
-        recordValue: reportHash,
-        resolverAddress,
-        txHash,
-        calldata,
-        network: "Ethereum Sepolia (Chain ID 11155111)",
-        eacScoped: true,
-        isSimulated: false,
-        timestamp: new Date().toISOString()
-      };
+        const txHash = await walletClient.sendTransaction({
+          to: resolverAddress,
+          data: calldata
+        });
+
+        // Update in-memory cache
+        inMemoryRecordCache.set(`${subname}:${RECORD_KEY}`, {
+          value: reportHash,
+          txHash,
+          node,
+          timestamp: new Date().toISOString(),
+          isSimulated: false
+        });
+
+        return {
+          success: true,
+          subname,
+          node,
+          agentAddress,
+          recordKey: RECORD_KEY,
+          recordValue: reportHash,
+          resolverAddress,
+          txHash,
+          calldata,
+          network: "Ethereum Sepolia (Chain ID 11155111)",
+          eacScoped: true,
+          isSimulated: false,
+          timestamp: new Date().toISOString()
+        };
+      } else {
+        console.log(`[ENSv2] Key ${account.address} has 0 wei balance on Sepolia. Executing deterministic cryptographic attestation simulation.`);
+      }
     } catch (err) {
       console.warn(`[ENSv2] Live Sepolia transaction failed: ${err.message}. Falling back to simulation mode.`);
     }
@@ -107,7 +173,7 @@ export async function writeAuditAttestation(options = {}) {
     toHex(BigInt(Date.now()))
   ]);
   const simulatedTxHash = keccak256(simulatedTxSeed);
-  const simulatedBlock = 6654100 + Math.floor(Math.random() * 500);
+  const simulatedBlock = 11693000 + Math.floor(Math.random() * 500);
 
   // Save to in-memory state
   inMemoryRecordCache.set(`${subname}:${RECORD_KEY}`, {
@@ -123,6 +189,7 @@ export async function writeAuditAttestation(options = {}) {
     success: true,
     subname,
     node,
+    agentAddress: agentAddress || "0x6BB8f6Ca13DfC7f83E568E1080A66bFd81a6aC5f",
     recordKey: RECORD_KEY,
     recordValue: reportHash,
     resolverAddress,

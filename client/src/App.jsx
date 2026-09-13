@@ -7,6 +7,7 @@ import AuditSummary from './components/AuditSummary';
 import ChallengeModal from './components/ChallengeModal';
 import DemoStudio from './components/DemoStudio';
 import EacInspector from './components/EacInspector';
+import NetworkStatusCard from './components/NetworkStatusCard';
 
 const DEFAULT_MPP_TOKEN = 'bazantic_mpp_gateway_session_9a8b7c6d5e4f3a2b1c0d';
 
@@ -38,8 +39,17 @@ export default function App() {
   const [agentProfile, setAgentProfile] = useState({
     agentName: 'oracle.agentcorp.eth',
     resolverAddress: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
+    agentAddress: '0x6BB8f6Ca13DfC7f83E568E1080A66bFd81a6aC5f',
+    wallet: {
+      hasKey: true,
+      address: '0x6BB8f6Ca13DfC7f83E568E1080A66bFd81a6aC5f',
+      balanceEth: '0.0000',
+      balanceWei: '0',
+      isFunded: false
+    },
     facilitatorAddress: '0x4020000000000000000000000000000000000001',
-    network: 'Ethereum Sepolia (Chain ID: 11155111)'
+    network: 'Ethereum Sepolia (Chain ID: 11155111)',
+    faucets: []
   });
 
   const [preset, setPreset] = useState('uniswap_top_5');
@@ -71,6 +81,9 @@ export default function App() {
           agentName: data.agentName,
           resolverAddress: data.resolverAddress,
           facilitatorAddress: data.bazanticFacilitator,
+          agentAddress: data.agentAddress,
+          wallet: data.wallet,
+          faucets: data.faucets || [],
           network: data.network
         });
       }
@@ -267,6 +280,8 @@ export default function App() {
       <HeaderBadge
         agentName={agentProfile.agentName}
         resolverAddress={agentProfile.resolverAddress}
+        agentAddress={agentProfile.agentAddress}
+        wallet={agentProfile.wallet}
         facilitatorAddress={agentProfile.facilitatorAddress}
         onOpenRecipe={openRecipeModal}
         theme={theme}
@@ -313,6 +328,13 @@ export default function App() {
             )}
           </div>
         </div>
+
+        {/* Live Agent Identity & Infrastructure Status */}
+        <NetworkStatusCard
+          agentProfile={agentProfile}
+          onRefresh={fetchProfile}
+          lastResult={auditResult}
+        />
 
         {/* Interactive Demo Studio & In-Browser Video Recording */}
         <DemoStudio

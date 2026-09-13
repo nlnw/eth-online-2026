@@ -151,6 +151,7 @@ async function runRecordingFlow() {
       environment: 'Ethereum Sepolia Testnet',
       totalDurationMs,
       agentSubname: healthData.subname,
+      agentAddress: healthData.agentAddress || '0x6BB8f6Ca13DfC7f83E568E1080A66bFd81a6aC5f',
       facilitator: healthData.bazanticFacilitator,
       resolverAddress: healthData.resolverAddress
     },

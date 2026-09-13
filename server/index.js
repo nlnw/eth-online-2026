@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { readFileSync } from 'fs';
 import { fetchSubgraphLiquidity } from './src/graph.js';
-import { writeAuditAttestation, readAuditAttestation } from './src/ens.js';
+import { writeAuditAttestation, readAuditAttestation, getAgentWalletStatus } from './src/ens.js';
 
 dotenv.config();
 
@@ -33,16 +33,24 @@ app.use((req, res, next) => {
 /**
  * Health & Gateway Identity Status
  */
-app.get('/api/health', (req, res) => {
+app.get('/api/health', async (req, res) => {
+  const wallet = await getAgentWalletStatus();
   res.json({
     status: 'online',
     service: 'GraphAgent Gateway',
     version: '1.0.0',
     agentName: AGENT_SUBNAME,
     subname: AGENT_SUBNAME,
+    agentAddress: wallet.address || '0x6BB8f6Ca13DfC7f83E568E1080A66bFd81a6aC5f',
+    wallet,
     network: 'Ethereum Sepolia (Chain ID: 11155111)',
     resolverAddress: RESOLVER_ADDRESS,
     bazanticFacilitator: FACILITATOR_ADDRESS,
+    faucets: [
+      'https://cloud.google.com/application/web3/faucet/ethereum/sepolia',
+      'https://www.alchemy.com/faucets/ethereum-sepolia',
+      'https://sepolia-faucet.pk910.de/'
+    ],
     timestamp: new Date().toISOString()
   });
 });
@@ -66,9 +74,12 @@ app.get('/api/recipe', (req, res) => {
 app.get('/api/agent-profile', async (req, res) => {
   try {
     const record = await readAuditAttestation(AGENT_SUBNAME);
+    const wallet = await getAgentWalletStatus();
     res.json({
       agentName: AGENT_SUBNAME,
       subname: AGENT_SUBNAME,
+      agentAddress: wallet.address || '0x6BB8f6Ca13DfC7f83E568E1080A66bFd81a6aC5f',
+      wallet,
       resolverAddress: RESOLVER_ADDRESS,
       eacScoped: true,
       lastAuditRecord: record,
@@ -77,7 +88,12 @@ app.get('/api/agent-profile', async (req, res) => {
         active: true,
         protocol: 'x402',
         facilitator: FACILITATOR_ADDRESS
-      }
+      },
+      faucets: [
+        'https://cloud.google.com/application/web3/faucet/ethereum/sepolia',
+        'https://www.alchemy.com/faucets/ethereum-sepolia',
+        'https://sepolia-faucet.pk910.de/'
+      ]
     });
   } catch (err) {
     res.status(500).json({ error: 'Failed to retrieve agent profile', details: err.message });
@@ -303,6 +319,7 @@ app.post('/api/run-audit', async (req, res) => {
       success: true,
       agentName: AGENT_SUBNAME,
       subname: AGENT_SUBNAME,
+      agentAddress: ensResult.agentAddress || '0x6BB8f6Ca13DfC7f83E568E1080A66bFd81a6aC5f',
       reportHash: graphResult.reportHash,
       txHash: ensResult.txHash,
       blockNumber: ensResult.blockNumber,
@@ -311,10 +328,12 @@ app.post('/api/run-audit', async (req, res) => {
       pools: graphResult.pools,
       summary: graphResult.summary,
       graphSource: graphResult.source,
+      isLive: graphResult.isLive,
       isGraphLive: graphResult.isLive,
       ensAttestation: {
         success: ensResult.success,
         node: ensResult.node,
+        agentAddress: ensResult.agentAddress,
         network: ensResult.network,
         isSimulated: ensResult.isSimulated,
         calldata: ensResult.calldata

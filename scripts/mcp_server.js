@@ -60,6 +60,14 @@ const TOOLS = [
       type: 'object',
       properties: {}
     }
+  },
+  {
+    name: 'get_agent_wallet_profile',
+    description: 'Retrieves the agent wallet address, live Sepolia ETH balance, ENSv2 subname, and faucet funding options.',
+    inputSchema: {
+      type: 'object',
+      properties: {}
+    }
   }
 ];
 
@@ -85,6 +93,7 @@ async function handleCallTool(params) {
                 success: true,
                 agentName: DEFAULT_SUBNAME,
                 subname: DEFAULT_SUBNAME,
+                agentAddress: ensResult.agentAddress,
                 reportHash: graphResult.reportHash,
                 txHash: ensResult.txHash,
                 blockNumber: ensResult.blockNumber,
@@ -132,6 +141,37 @@ async function handleCallTool(params) {
                 facilitator: FACILITATOR,
                 network: 'Ethereum Sepolia (Chain ID 11155111)',
                 requiredHeader: 'Authorization: Bearer bazantic_mpp_<token>'
+              },
+              null,
+              2
+            )
+          }
+        ]
+      };
+    }
+
+    case 'get_agent_wallet_profile': {
+      const { getAgentWalletStatus } = await import('../server/src/ens.js');
+      const wallet = await getAgentWalletStatus();
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                agentName: DEFAULT_SUBNAME,
+                subname: DEFAULT_SUBNAME,
+                agentAddress: wallet.address || '0x6BB8f6Ca13DfC7f83E568E1080A66bFd81a6aC5f',
+                balanceEth: wallet.balanceEth,
+                balanceWei: wallet.balanceWei,
+                isFunded: wallet.isFunded,
+                network: 'Ethereum Sepolia (Chain ID 11155111)',
+                resolverAddress: DEFAULT_RESOLVER,
+                faucets: [
+                  'https://cloud.google.com/application/web3/faucet/ethereum/sepolia',
+                  'https://www.alchemy.com/faucets/ethereum-sepolia',
+                  'https://sepolia-faucet.pk910.de/'
+                ]
               },
               null,
               2
