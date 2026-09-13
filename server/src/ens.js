@@ -24,7 +24,7 @@ const inMemoryRecordCache = new Map();
  * Get Sepolia Public Client
  */
 export function getSepoliaPublicClient() {
-  const rpcUrl = process.env.SEPOLIA_RPC_URL || 'https://rpc.sepolia.org';
+  const rpcUrl = process.env.SEPOLIA_RPC_URL || 'https://ethereum-sepolia-rpc.publicnode.com';
   return createPublicClient({
     chain: sepolia,
     transport: http(rpcUrl, { timeout: 8000 })
