@@ -15,25 +15,43 @@ export default function App() {
   // Light / Dark Mode state management
   const [theme, setTheme] = useState(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('graphagent_theme');
+      const saved = localStorage.getItem('sentinel402_theme') || localStorage.getItem('graphagent_theme');
       if (saved) return saved;
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
-    return 'dark';
+    return 'light';
   });
 
-  useEffect(() => {
+  const applyTheme = (targetTheme) => {
+    if (typeof document === 'undefined') return;
     const root = document.documentElement;
-    if (theme === 'dark') {
+    const body = document.body;
+    if (targetTheme === 'dark') {
       root.classList.add('dark');
+      if (body) body.classList.add('dark');
     } else {
       root.classList.remove('dark');
+      if (body) body.classList.remove('dark');
     }
-    localStorage.setItem('graphagent_theme', theme);
+    root.setAttribute('data-theme', targetTheme);
+    if (body) body.setAttribute('data-theme', targetTheme);
+    try {
+      localStorage.setItem('sentinel402_theme', targetTheme);
+      localStorage.setItem('graphagent_theme', targetTheme);
+    } catch (_e) {}
+    setTheme(targetTheme);
+  };
+
+  useEffect(() => {
+    applyTheme(theme);
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+    applyTheme(theme === 'dark' ? 'light' : 'dark');
+  };
+
+  const setThemeMode = (mode) => {
+    applyTheme(mode);
   };
 
   const [agentProfile, setAgentProfile] = useState({
@@ -286,6 +304,7 @@ export default function App() {
         onOpenRecipe={openRecipeModal}
         theme={theme}
         onToggleTheme={toggleTheme}
+        onSetTheme={setThemeMode}
       />
 
       <main className="max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 space-y-5 flex-1">

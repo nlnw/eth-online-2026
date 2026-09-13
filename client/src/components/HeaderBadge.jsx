@@ -9,7 +9,8 @@ export default function HeaderBadge({
   facilitatorAddress,
   onOpenRecipe,
   theme,
-  onToggleTheme
+  onToggleTheme,
+  onSetTheme
 }) {
   const [copiedResolver, setCopiedResolver] = useState(false);
   const [copiedAgent, setCopiedAgent] = useState(false);
@@ -106,15 +107,35 @@ export default function HeaderBadge({
             <span>Recipe Spec</span>
           </button>
 
-          {/* Theme switcher */}
-          <button
-            onClick={onToggleTheme}
-            className="p-1.5 rounded border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition"
-            title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-            aria-label="Toggle theme"
-          >
-            {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
+          {/* Segmented Theme Switcher */}
+          <div className="inline-flex items-center rounded border border-zinc-200 dark:border-zinc-800 p-0.5 bg-zinc-100 dark:bg-zinc-800/80 font-mono text-[11px]">
+            <button
+              type="button"
+              onClick={() => (onSetTheme ? onSetTheme('light') : onToggleTheme?.())}
+              className={`flex items-center gap-1 px-2 py-1 rounded transition ${
+                theme === 'light'
+                  ? 'bg-white text-zinc-900 shadow-xs font-semibold'
+                  : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
+              }`}
+              title="Activate Light Mode"
+            >
+              <Sun className="w-3 h-3" />
+              <span>Light</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => (onSetTheme ? onSetTheme('dark') : onToggleTheme?.())}
+              className={`flex items-center gap-1 px-2 py-1 rounded transition ${
+                theme === 'dark'
+                  ? 'bg-zinc-900 text-white shadow-xs font-semibold'
+                  : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
+              }`}
+              title="Activate Dark Mode"
+            >
+              <Moon className="w-3 h-3" />
+              <span>Dark</span>
+            </button>
+          </div>
         </div>
       </div>
     </header>
