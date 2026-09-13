@@ -11,6 +11,8 @@
     "build": "npm run build --prefix client",
     "record": "bash scripts/record.sh",
     "play": "uvx asciinema play recordings/demo.cast",
+    "generate-wallet": "node scripts/generate_wallet.js",
+    "mcp": "node scripts/mcp_server.js",
     "start": "node server/index.js",
     "install:all": "npm install && npm install --prefix client"
   },

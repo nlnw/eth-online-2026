@@ -1,0 +1,42 @@
+{
+  "project": {
+    "name": "GraphAgent Gateway",
+    "version": "1.0.0",
+    "network": "Ethereum Sepolia (Chain ID 11155111)",
+    "description": "Autonomous AI agent gateway integrating The Graph Subgraph Studio, Bazantic x402 Micropayments, and ENSv2 Permissioned Resolvers"
+  },
+  "ens": {
+    "subname": "oracle.agentcorp.eth",
+    "defaultResolver": "0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41",
+    "recordKey": "records['last_audit_hash']",
+    "defaultRpc": "https://ethereum-sepolia-rpc.publicnode.com"
+  },
+  "bazantic": {
+    "protocol": "x402",
+    "realm": "bazantic-mpp-gateway",
+    "facilitator": "0x4020000000000000000000000000000000000001",
+    "recipient": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+    "priceEth": "0.001",
+    "pricingTier": "audit-compute-standard"
+  },
+  "subgraph": {
+    "defaultSubgraphId": "uniswap/uniswap-v3",
+    "presets": [
+      {
+        "id": "uniswap_top_5",
+        "name": "Uniswap v3 Top 5 TVL Pools",
+        "limit": 5
+      },
+      {
+        "id": "uniswap_top_10",
+        "name": "Uniswap v3 Top 10 High Volume Pools",
+        "limit": 10
+      },
+      {
+        "id": "stable_depth",
+        "name": "Stablecoin Depth Pools (USDC / USDT / DAI)",
+        "limit": 4
+      }
+    ]
+  }
+}

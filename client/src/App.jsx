@@ -6,6 +6,7 @@ import PoolsTable from './components/PoolsTable';
 import AuditSummary from './components/AuditSummary';
 import ChallengeModal from './components/ChallengeModal';
 import DemoStudio from './components/DemoStudio';
+import EacInspector from './components/EacInspector';
 
 const DEFAULT_MPP_TOKEN = 'bazantic_mpp_gateway_session_9a8b7c6d5e4f3a2b1c0d';
 
@@ -400,6 +401,18 @@ export default function App() {
 
         {/* Summary Card */}
         {auditResult && <AuditSummary data={auditResult} />}
+
+        {/* ENSv2 EAC & Calldata Decoder */}
+        {auditResult && (
+          <EacInspector
+            attestationData={{
+              ...auditResult.ensAttestation,
+              calldata: auditResult.ensAttestation?.calldata
+            }}
+            agentName={auditResult.agentName}
+            resolverAddress={auditResult.resolverAddress}
+          />
+        )}
 
         {/* Pools Table */}
         <PoolsTable

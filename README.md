@@ -105,19 +105,40 @@ cp .env.example .env
 Default parameters in `.env`:
 - `PORT=8080`
 - `THE_GRAPH_SUBGRAPH_URL=https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3`
-- `SEPOLIA_RPC_URL=https://rpc.sepolia.org`
+- `SEPOLIA_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com`
 - `ENS_AGENT_SUBNAME=oracle.agentcorp.eth`
 - `X402_FACILITATOR_ADDRESS=0x4020000000000000000000000000000000000001`
 
 ### 3. Run Locally
 Run both backend server and frontend client concurrently:
 ```bash
-### 4. Automated Flow Execution & Recording
+npm run dev
+```
+- Frontend: `http://localhost:5173`
+- Backend API: `http://localhost:8080`
+
+### 4. Model Context Protocol (MCP) Server (The Graph AI Tooling Track)
+Run the native AI Agent MCP server:
+```bash
+npm run mcp
+```
+*(Also exposed via HTTP JSON-RPC at `POST /api/mcp`)*
+
+### 5. Automated Flow Execution & Recording
 To run through the complete unauthenticated-to-authenticated lifecycle and record the run:
 ```bash
+# Run flow and record both JSON audit & asciinema terminal cast
 npm run record
+
+# Replay recorded terminal cast
+npm run play
 ```
-This generates a structured execution recording in `recordings/latest_flow_record.json`.
+
+### 6. Generate Sepolia Testnet Keypair (Optional)
+Generate a fresh Ethereum Sepolia keypair and get faucet links:
+```bash
+npm run generate-wallet
+```
 
 ---
 

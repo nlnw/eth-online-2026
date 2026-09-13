@@ -142,6 +142,104 @@ app.get('/api/challenge', (req, res) => {
 });
 
 /**
+ * Model Context Protocol (MCP) JSON-RPC Endpoint for AI Agents
+ */
+app.post('/api/mcp', async (req, res) => {
+  const { jsonrpc, id, method, params } = req.body || {};
+
+  if (method === 'initialize') {
+    return res.json({
+      jsonrpc: '2.0',
+      id,
+      result: {
+        protocolVersion: '2024-11-05',
+        capabilities: { tools: {} },
+        serverInfo: { name: 'graphagent-gateway-mcp', version: '1.0.0' }
+      }
+    });
+  }
+
+  if (method === 'tools/list') {
+    return res.json({
+      jsonrpc: '2.0',
+      id,
+      result: {
+        tools: [
+          {
+            name: 'audit_pool_liquidity',
+            description: 'Queries The Graph Subgraph Studio for DEX liquidity pools, computes a deterministic keccak256 audit hash, and writes on-chain attestation to the ENSv2 Permissioned Resolver on Sepolia.',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                limit: { type: 'number', default: 5 },
+                preset: { type: 'string', default: 'uniswap_top_5' }
+              }
+            }
+          },
+          {
+            name: 'get_ens_attestation',
+            description: 'Reads the latest attested cryptographic audit hash from the ENSv2 Permissioned Resolver on Ethereum Sepolia.',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                subname: { type: 'string', default: AGENT_SUBNAME }
+              }
+            }
+          }
+        ]
+      }
+    });
+  }
+
+  if (method === 'tools/call') {
+    const toolName = params?.name;
+    if (toolName === 'audit_pool_liquidity') {
+      const graphResult = await fetchSubgraphLiquidity({ limit: params?.arguments?.limit || 5 });
+      const ensResult = await writeAuditAttestation({
+        subname: AGENT_SUBNAME,
+        reportHash: graphResult.reportHash
+      });
+      return res.json({
+        jsonrpc: '2.0',
+        id,
+        result: {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                success: true,
+                reportHash: graphResult.reportHash,
+                txHash: ensResult.txHash,
+                poolsCount: graphResult.pools.length,
+                totalTvlUSD: graphResult.summary.totalTvlUSD,
+                liquidityScore: graphResult.summary.liquidityScore
+              }, null, 2)
+            }
+          ]
+        }
+      });
+    }
+
+    if (toolName === 'get_ens_attestation') {
+      const record = await readAuditAttestation(params?.arguments?.subname || AGENT_SUBNAME);
+      return res.json({
+        jsonrpc: '2.0',
+        id,
+        result: {
+          content: [{ type: 'text', text: JSON.stringify(record, null, 2) }]
+        }
+      });
+    }
+  }
+
+  res.status(400).json({
+    jsonrpc: '2.0',
+    id,
+    error: { code: -32601, message: `Unsupported method: ${method}` }
+  });
+});
+
+/**
  * POST /api/run-audit
  * Core pipeline handler:
  * 1. Checks for Bazantic Gateway authorization header (`authorization: Bearer bazantic_mpp_...`). If missing, returns HTTP 402 challenge.
