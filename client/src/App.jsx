@@ -5,6 +5,7 @@ import TerminalLog from './components/TerminalLog';
 import PoolsTable from './components/PoolsTable';
 import AuditSummary from './components/AuditSummary';
 import ChallengeModal from './components/ChallengeModal';
+import DemoStudio from './components/DemoStudio';
 
 const DEFAULT_MPP_TOKEN = 'bazantic_mpp_gateway_session_9a8b7c6d5e4f3a2b1c0d';
 
@@ -311,6 +312,13 @@ export default function App() {
             )}
           </div>
         </div>
+
+        {/* Interactive Demo Studio & In-Browser Video Recording */}
+        <DemoStudio
+          onRunAutoFlow={handleAutoRunFlow}
+          isExecuting={isExecuting}
+          recordedRun={recordedRun}
+        />
 
         {/* Controls Toolbar */}
         <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-md p-3 shadow-sm">
