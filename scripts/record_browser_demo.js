@@ -73,10 +73,10 @@ async function run() {
   });
 
   const context = await browser.newContext({
-    viewport: { width: 1920, height: 1080 },
+    viewport: { width: 1440, height: 810 },
     recordVideo: {
       dir: VIDEO_DIR,
-      size: { width: 1920, height: 1080 }
+      size: { width: 1440, height: 810 }
     }
   });
 
@@ -84,6 +84,11 @@ async function run() {
 
   console.log('[2/7] Navigating to http://localhost:5173...');
   await page.goto('http://localhost:5173', { waitUntil: 'networkidle' });
+  await page.evaluate(() => {
+    localStorage.setItem('sentinel402_theme', 'dark');
+    document.documentElement.classList.add('dark');
+    document.body.classList.add('dark');
+  });
   await wait(2000);
 
   // -------------------------------------------------------------------------
@@ -281,6 +286,16 @@ async function run() {
     execSync(`bash "${path.join(ROOT_DIR, 'scripts', 'mux_video.sh')}" "${targetVideoPath}" "${audioPath}" "${finalOutputPath}"`, {
       stdio: 'inherit'
     });
+
+    // Clean up intermediate raw webm video files and temporary directory
+    if (fs.existsSync(VIDEO_DIR)) {
+      fs.rmSync(VIDEO_DIR, { recursive: true, force: true });
+    }
+    if (fs.existsSync(targetVideoPath)) {
+      fs.unlinkSync(targetVideoPath);
+    }
+    console.log('[Cleanup] Removed raw intermediate webm video captures.');
+
     console.log(`\n🎉 SUBMISSION VIDEO READY: ${finalOutputPath}`);
   } else {
     console.log('\n[Notice] Audio file not found. Run `npm run voiceover` then `npm run mux` to assemble.');

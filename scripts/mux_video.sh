@@ -69,7 +69,7 @@ ffmpeg -y \
   -preset medium \
   -crf 18 \
   -pix_fmt yuv420p \
-  -c:a aac \
+  -c:a libmp3lame \
   -b:a 192k \
   -filter:a "loudnorm=I=-16:TP=-1.5:LRA=11" \
   -movflags +faststart \
