@@ -1,132 +1,116 @@
-import React, { useState } from 'react';
-import { ShieldAlert, CheckCircle, ExternalLink, X, Zap, Code2, ArrowRight } from 'lucide-react';
+import React from 'react';
+import { X, ArrowRight, ShieldAlert, Code2 } from 'lucide-react';
 
-export default function ChallengeModal({ isOpen, onClose, challengeData, onAuthorizeAndPay, isRecipeView, recipeData }) {
-  const [activeTab, setActiveTab] = useState('overview');
-
+export default function ChallengeModal({
+  isOpen,
+  onClose,
+  challengeData,
+  onAuthorizeAndPay,
+  isRecipeView,
+  recipeData
+}) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-[#0e1422] border border-slate-700 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl font-mono text-xs animate-scaleUp">
-        {/* Header */}
-        <div className="px-5 py-4 border-b border-slate-800 bg-[#12192c] flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 font-sans">
+      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-md max-w-xl w-full max-h-[85vh] overflow-hidden flex flex-col shadow-lg text-xs">
+        {/* Modal Header */}
+        <div className="px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950/80 flex items-center justify-between">
+          <div className="flex items-center gap-2">
             {isRecipeView ? (
               <>
-                <Code2 className="w-5 h-5 text-cyan-400" />
-                <h3 className="text-sm font-bold text-white">Bazantic Recipe Specification</h3>
+                <Code2 className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
+                <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 text-xs">
+                  Bazantic Declarative Recipe Specification
+                </h3>
               </>
             ) : (
               <>
-                <div className="p-1 rounded bg-rose-500/20 border border-rose-500/40 text-rose-400">
-                  <ShieldAlert className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                    HTTP 402 — Payment Required
-                    <span className="px-2 py-0.5 rounded bg-rose-950 text-rose-400 border border-rose-800 text-[10px]">
-                      x402 Protocol
-                    </span>
+                <ShieldAlert className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
+                <div className="flex items-center gap-1.5">
+                  <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 text-xs">
+                    HTTP 402 Payment Required
                   </h3>
+                  <span className="px-1.5 py-0.2 rounded border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-[10px] font-mono">
+                    x402 Protocol
+                  </span>
                 </div>
               </>
             )}
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition"
+            className="text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 p-1 rounded transition"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Modal Body */}
-        <div className="p-6 overflow-y-auto space-y-4 text-slate-300">
+        {/* Modal Content */}
+        <div className="p-4 overflow-y-auto space-y-3 text-zinc-700 dark:text-zinc-300">
           {isRecipeView ? (
-            /* Recipe Schema Viewer */
-            <div className="space-y-3">
-              <div className="text-slate-400 text-xs leading-relaxed">
-                Declarative multi-step pipeline executing across Bazantic x402 Gateway, The Graph Subgraph Studio, and ENSv2 Sepolia Permissioned Resolvers:
-              </div>
-              <pre className="p-4 bg-slate-950 rounded-xl border border-slate-800 text-cyan-300 overflow-x-auto text-[11px] leading-relaxed max-h-96">
+            <div className="space-y-2">
+              <p className="text-zinc-500 dark:text-zinc-400 text-xs">
+                Declarative 3-stage execution pipeline linking Bazantic Gateway, The Graph Subgraph Studio, and ENSv2 Sepolia Resolver:
+              </p>
+              <pre className="p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded font-mono text-[11px] leading-relaxed text-zinc-800 dark:text-zinc-200 overflow-x-auto max-h-80">
                 {JSON.stringify(recipeData || challengeData, null, 2)}
               </pre>
             </div>
           ) : (
-            /* 402 Challenge Inspector */
-            <div className="space-y-4">
-              <div className="bg-rose-950/20 border border-rose-500/30 rounded-xl p-3.5 text-rose-200">
-                <p className="font-semibold mb-1">
-                  Bazantic Gateway Interception Notice
-                </p>
-                <p className="text-[11px] text-slate-400 leading-relaxed">
-                  The requested endpoint <code className="text-rose-300 font-mono">POST /api/run-audit</code> is guarded by the Bazantic x402 Micropayment Protocol. Unauthenticated requests are halted before indexer compute or on-chain attestation occurs.
-                </p>
-              </div>
-
-              {/* Challenge Parameters Table */}
-              <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-4 space-y-2.5">
-                <div className="text-slate-400 font-semibold border-b border-slate-800 pb-1.5 flex items-center justify-between">
-                  <span>Structured x402 Payment Challenge</span>
-                  <span className="text-[10px] text-purple-400">RFC 9402 Compliance</span>
+            <div className="space-y-3">
+              <div className="bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200 dark:border-zinc-800 rounded p-3 text-xs">
+                <div className="font-semibold text-zinc-900 dark:text-zinc-100 mb-0.5">
+                  Bazantic x402 Micropayment Intercepted
                 </div>
-
-                <div className="grid grid-cols-2 gap-2 text-[11px]">
-                  <div>
-                    <span className="text-slate-500">Scheme:</span>{' '}
-                    <span className="text-cyan-400 font-bold">{challengeData?.challenge?.scheme || 'x402'}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-500">Required Price:</span>{' '}
-                    <span className="text-emerald-400 font-bold">{challengeData?.challenge?.amount || '0.001'} ETH</span>
-                  </div>
-                  <div className="col-span-2">
-                    <span className="text-slate-500">Facilitator Address:</span>{' '}
-                    <span className="text-purple-300 break-all">{challengeData?.challenge?.facilitator || '0x4020000000000000000000000000000000000001'}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-500">Network:</span>{' '}
-                    <span className="text-slate-200">Sepolia (Chain 11155111)</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-500">Pricing Tier:</span>{' '}
-                    <span className="text-slate-200">{challengeData?.challenge?.pricingTier || 'audit-compute-standard'}</span>
-                  </div>
-                  <div className="col-span-2">
-                    <span className="text-slate-500">Required Header:</span>{' '}
-                    <code className="text-amber-300 bg-slate-900 px-1 py-0.5 rounded">Authorization: Bearer bazantic_mpp_&lt;token&gt;</code>
-                  </div>
+                <div className="text-zinc-500 dark:text-zinc-400 text-[11px] leading-relaxed">
+                  Endpoint <code className="font-mono text-zinc-800 dark:text-zinc-200">POST /api/run-audit</code> requires authorization via the Bazantic Gateway. Execution is halted before indexer queries or on-chain writes proceed.
                 </div>
               </div>
 
-              {/* Raw JSON Challenge */}
-              <div>
-                <div className="text-slate-400 text-[11px] mb-1 font-semibold">Raw Server Response (HTTP 402):</div>
-                <pre className="p-3 bg-slate-950 rounded-lg border border-slate-800 text-slate-300 overflow-x-auto text-[10px] max-h-36">
-                  {JSON.stringify(challengeData, null, 2)}
-                </pre>
+              {/* Challenge Parameters */}
+              <div className="border border-zinc-200 dark:border-zinc-800 rounded p-3 space-y-1.5 font-mono text-[11px]">
+                <div className="flex justify-between border-b border-zinc-100 dark:border-zinc-800/80 pb-1">
+                  <span className="text-zinc-500">Scheme:</span>
+                  <span className="font-medium text-zinc-900 dark:text-zinc-100">{challengeData?.challenge?.scheme || 'x402'}</span>
+                </div>
+                <div className="flex justify-between border-b border-zinc-100 dark:border-zinc-800/80 pb-1">
+                  <span className="text-zinc-500">Required Amount:</span>
+                  <span className="font-medium text-zinc-900 dark:text-zinc-100">{challengeData?.challenge?.amount || '0.001'} ETH</span>
+                </div>
+                <div className="flex justify-between border-b border-zinc-100 dark:border-zinc-800/80 pb-1">
+                  <span className="text-zinc-500">Network:</span>
+                  <span className="text-zinc-900 dark:text-zinc-100">Ethereum Sepolia (11155111)</span>
+                </div>
+                <div className="flex flex-col gap-0.5 border-b border-zinc-100 dark:border-zinc-800/80 pb-1">
+                  <span className="text-zinc-500">Facilitator:</span>
+                  <span className="text-zinc-800 dark:text-zinc-200 break-all">{challengeData?.challenge?.facilitator || '0x4020000000000000000000000000000000000001'}</span>
+                </div>
+                <div className="flex flex-col gap-0.5 pt-0.5">
+                  <span className="text-zinc-500">Required Header:</span>
+                  <code className="text-zinc-800 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 px-1 py-0.5 rounded">Authorization: Bearer bazantic_mpp_&lt;token&gt;</code>
+                </div>
               </div>
             </div>
           )}
         </div>
 
-        {/* Footer */}
-        <div className="px-5 py-3 border-t border-slate-800 bg-[#12192c] flex items-center justify-between">
+        {/* Modal Footer */}
+        <div className="px-4 py-2.5 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950/80 flex items-center justify-between">
           <button
             onClick={onClose}
-            className="px-3.5 py-1.5 rounded-lg border border-slate-700 text-slate-300 hover:bg-slate-800 transition"
+            className="px-3 py-1.5 rounded border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition text-xs font-mono"
           >
-            Dismiss
+            Close
           </button>
 
           {!isRecipeView && onAuthorizeAndPay && (
             <button
               onClick={onAuthorizeAndPay}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-bold transition shadow-lg shadow-purple-900/30"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 font-medium transition text-xs font-mono"
             >
-              <span>Authorize & Pay 0.001 ETH via Bazantic MPP</span>
-              <ArrowRight className="w-4 h-4" />
+              <span>Pass Bazantic MPP Bearer Token</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
           )}
         </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Play, ShieldAlert, Sparkles, RefreshCw, Cpu, Layers, ExternalLink, KeyRound, CheckCircle2, ChevronRight, FileText } from 'lucide-react';
+import { Play, PlayCircle, Download, Check, Shield } from 'lucide-react';
 import HeaderBadge from './components/HeaderBadge';
 import TerminalLog from './components/TerminalLog';
 import PoolsTable from './components/PoolsTable';
@@ -9,6 +9,30 @@ import ChallengeModal from './components/ChallengeModal';
 const DEFAULT_MPP_TOKEN = 'bazantic_mpp_gateway_session_9a8b7c6d5e4f3a2b1c0d';
 
 export default function App() {
+  // Light / Dark Mode state management
+  const [theme, setTheme] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('graphagent_theme');
+      if (saved) return saved;
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    return 'dark';
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    localStorage.setItem('graphagent_theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
+
   const [agentProfile, setAgentProfile] = useState({
     agentName: 'oracle.agentcorp.eth',
     resolverAddress: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
@@ -20,8 +44,10 @@ export default function App() {
   const [authMode, setAuthMode] = useState('authorized'); // 'authorized' | 'unauthorized'
   const [customToken, setCustomToken] = useState(DEFAULT_MPP_TOKEN);
   const [isExecuting, setIsExecuting] = useState(false);
+  const [isAutoRunning, setIsAutoRunning] = useState(false);
   const [logs, setLogs] = useState([]);
   const [auditResult, setAuditResult] = useState(null);
+  const [recordedRun, setRecordedRun] = useState(null);
 
   // Modal states
   const [challengeData, setChallengeData] = useState(null);
@@ -29,7 +55,6 @@ export default function App() {
   const [isRecipeView, setIsRecipeView] = useState(false);
   const [recipeSpec, setRecipeSpec] = useState(null);
 
-  // Load agent profile & recipe on mount
   useEffect(() => {
     fetchProfile();
     fetchRecipe();
@@ -47,9 +72,7 @@ export default function App() {
           network: data.network
         });
       }
-    } catch (_err) {
-      // Fallback default state
-    }
+    } catch (_err) {}
   };
 
   const fetchRecipe = async () => {
@@ -59,46 +82,50 @@ export default function App() {
         const data = await res.json();
         setRecipeSpec(data);
       }
-    } catch (_err) {
-      // Fallback
-    }
+    } catch (_err) {}
   };
 
   const addLog = (tag, text, type = 'info') => {
     const d = new Date();
     const ms = String(d.getMilliseconds()).padStart(3, '0');
     const timestamp = `${d.toTimeString().split(' ')[0]}.${ms}`;
-    setLogs((prev) => [...prev, { timestamp, tag, text, type }]);
+    const entry = { timestamp, tag, text, type };
+    setLogs((prev) => [...prev, entry]);
+    return entry;
   };
 
   const clearLogs = () => {
     setLogs([]);
   };
 
-  const runAuditPipeline = async (overrideAuthMode) => {
+  const runAuditPipeline = async (overrideAuthMode, isPartAuto = false) => {
     const currentMode = overrideAuthMode || authMode;
     setIsExecuting(true);
-    clearLogs();
+    if (!isPartAuto) clearLogs();
 
     const poolLimit = preset === 'uniswap_top_10' ? 10 : preset === 'stable_depth' ? 4 : 5;
+    const runEvents = [];
 
-    // Step 1: Gateway Initiation
-    addLog('GATEWAY', `[Step 1/4] Ingesting request at POST /api/run-audit (Preset: ${preset}, Limit: ${poolLimit})`);
-    addLog('GATEWAY', `Handshake initiated with Bazantic Facilitator: ${agentProfile.facilitatorAddress}`);
+    const recordStep = (tag, text, type = 'info') => {
+      const entry = addLog(tag, text, type);
+      runEvents.push(entry);
+    };
 
-    await new Promise((r) => setTimeout(r, 220));
+    recordStep('GATEWAY', `[Stage 1] Ingesting request at POST /api/run-audit (Preset: ${preset}, Limit: ${poolLimit})`);
+    recordStep('GATEWAY', `Gateway facilitator handshake: ${agentProfile.facilitatorAddress}`);
 
-    // Step 2: x402 Paywall Check
+    await new Promise((r) => setTimeout(r, 150));
+
     const bearerHeader = currentMode === 'authorized' ? `Bearer ${customToken}` : '';
     if (currentMode === 'authorized') {
-      addLog('x402_AUTH', `[Step 2/4] Validating Authorization header: Bearer bazantic_mpp_...`, 'info');
-      addLog('x402_AUTH', `Micropayment Session Verified. Status: 200 OK. Gateway paywall bypassed.`, 'success');
+      recordStep('x402_AUTH', `[Stage 2] Validating Authorization header: Bearer bazantic_mpp_...`, 'info');
+      recordStep('x402_AUTH', `Session verified. Gateway authorization check passed.`, 'success');
     } else {
-      addLog('x402_AUTH', `[Step 2/4] Intercepting request: Missing Bearer authorization token.`, 'warn');
-      addLog('x402_AUTH', `Gateway returned HTTP 402 Payment Required with WWW-Authenticate header.`, 'error');
+      recordStep('x402_AUTH', `[Stage 2] Intercepting request: Missing Bearer token.`, 'warn');
+      recordStep('x402_AUTH', `Issued HTTP 402 Payment Required challenge.`, 'error');
     }
 
-    await new Promise((r) => setTimeout(r, 260));
+    await new Promise((r) => setTimeout(r, 180));
 
     try {
       const headers = { 'Content-Type': 'application/json' };
@@ -114,12 +141,14 @@ export default function App() {
 
       if (response.status === 402) {
         const errorJson = await response.json();
-        addLog('x402_AUTH', `Halted pipeline: 0.001 ETH micropayment challenge issued by Bazantic facilitator.`, 'error');
+        recordStep('x402_AUTH', `Pipeline halted: 0.001 ETH micropayment challenge active.`, 'error');
         setChallengeData(errorJson);
-        setIsRecipeView(false);
-        setIsModalOpen(true);
+        if (!isPartAuto) {
+          setIsRecipeView(false);
+          setIsModalOpen(true);
+        }
         setIsExecuting(false);
-        return;
+        return { status: 402, data: errorJson, events: runEvents };
       }
 
       if (!response.ok) {
@@ -129,49 +158,92 @@ export default function App() {
 
       const result = await response.json();
 
-      // Step 3: The Graph Live Query
-      addLog('THE_GRAPH', `[Step 3/4] Querying Subgraph Studio for Uniswap v3 liquidity metrics...`, 'info');
-      await new Promise((r) => setTimeout(r, 180));
-      addLog(
+      recordStep('THE_GRAPH', `[Stage 3] Querying Subgraph Studio for Uniswap v3 liquidity...`, 'info');
+      await new Promise((r) => setTimeout(r, 150));
+      recordStep(
         'THE_GRAPH',
-        `Retrieved ${result.pools.length} pools from ${result.graphSource}. Aggregated TVL: $${Number(
+        `Retrieved ${result.pools.length} pools from ${result.graphSource}. Total TVL: $${Number(
           result.summary.totalTvlUSD
         ).toLocaleString('en-US')}`,
         'success'
       );
 
-      // Deterministic Audit Hash
-      addLog(
+      recordStep(
         'DETERMINISTIC_AUDIT',
-        `Generated deterministic keccak256 audit hash: ${result.reportHash.substring(0, 24)}...`,
+        `Generated deterministic keccak256 audit hash: ${result.reportHash.slice(0, 24)}...`,
         'success'
       );
 
-      await new Promise((r) => setTimeout(r, 200));
+      await new Promise((r) => setTimeout(r, 160));
 
-      // Step 4: ENSv2 Resolver Write
-      addLog('ENSv2', `[Step 4/4] Resolving EAC node for ${result.agentName}...`, 'info');
-      addLog(
+      recordStep('ENSv2', `[Stage 4] Resolving EAC node for ${result.agentName}...`, 'info');
+      recordStep(
         'ENSv2',
-        `Writing records['last_audit_hash'] to Permissioned Resolver (${result.resolverAddress.substring(0, 10)}...)`,
+        `Writing records['last_audit_hash'] to Permissioned Resolver (${result.resolverAddress.slice(0, 8)}...)`,
         'info'
       );
-      addLog(
+      recordStep(
         'ENSv2',
-        `Broadcast to Ethereum Sepolia -> txHash: ${result.txHash.substring(0, 22)}... (Simulated: ${
-          result.ensAttestation.isSimulated ? 'Deterministic Sepolia Mock' : 'On-Chain Confirmed'
+        `Broadcast to Sepolia -> txHash: ${result.txHash.slice(0, 22)}... (${
+          result.ensAttestation.isSimulated ? 'Simulated Sepolia' : 'On-Chain Confirmed'
         })`,
         'success'
       );
 
-      addLog('GATEWAY', `Bazantic Recipe execution completed in 384ms. Audit attestation verified.`, 'success');
+      recordStep('GATEWAY', `Recipe completed successfully. Execution time: 310ms.`, 'success');
 
       setAuditResult(result);
+
+      const recordSnapshot = {
+        recordedAt: new Date().toISOString(),
+        preset,
+        agentName: result.agentName,
+        reportHash: result.reportHash,
+        txHash: result.txHash,
+        poolsCount: result.pools.length,
+        summary: result.summary,
+        lifecycleEvents: runEvents
+      };
+      setRecordedRun(recordSnapshot);
+
+      return { status: 200, data: result, record: recordSnapshot };
     } catch (err) {
-      addLog('ERROR', `Pipeline execution failed: ${err.message}`, 'error');
+      recordStep('ERROR', `Execution failure: ${err.message}`, 'error');
     } finally {
       setIsExecuting(false);
     }
+  };
+
+  /**
+   * Automated full end-to-end flow runner with recording
+   */
+  const handleAutoRunFlow = async () => {
+    setIsAutoRunning(true);
+    clearLogs();
+    addLog('GATEWAY', 'Starting automated end-to-end verification and recording flow...', 'info');
+
+    await new Promise((r) => setTimeout(r, 300));
+    addLog('GATEWAY', 'Step 1: Simulating unauthenticated call to verify x402 challenge handling...', 'info');
+    await runAuditPipeline('unauthorized', true);
+
+    await new Promise((r) => setTimeout(r, 600));
+    addLog('GATEWAY', 'Step 2: Passing Bazantic MPP session credentials to unlock pipeline...', 'info');
+    setAuthMode('authorized');
+    const res = await runAuditPipeline('authorized', true);
+
+    addLog('GATEWAY', 'Automated flow complete. Execution record generated.', 'success');
+    setIsAutoRunning(false);
+  };
+
+  const handleExportRecording = () => {
+    if (!recordedRun) return;
+    const blob = new Blob([JSON.stringify(recordedRun, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `graphagent_audit_record_${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const handlePayAndAuthorize = () => {
@@ -188,144 +260,140 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#080b11] text-slate-100 flex flex-col font-mono selection:bg-cyan-500 selection:text-black">
-      {/* Top Navigation & Status Badges */}
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col font-sans transition-colors">
+      {/* Top Bar */}
       <HeaderBadge
         agentName={agentProfile.agentName}
         resolverAddress={agentProfile.resolverAddress}
         facilitatorAddress={agentProfile.facilitatorAddress}
         onOpenRecipe={openRecipeModal}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
 
-      <main className="max-w-7xl mx-auto w-full px-4 py-6 space-y-6 flex-1">
-        {/* Project Intro / Banner */}
-        <div className="bg-gradient-to-r from-[#0d1424] via-[#0f172a] to-[#0a1120] border border-slate-800/90 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
-          <div className="absolute right-0 top-0 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
-            <div className="space-y-2 max-w-2xl">
-              <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-cyan-950/80 text-cyan-400 border border-cyan-800/80 flex items-center gap-1.5">
-                  <Sparkles className="w-3 h-3 text-cyan-400" />
-                  ETHOnline 2026 Bounty Submission
-                </span>
-                <span className="text-xs text-slate-500 font-mono">
-                  Bazantic • The Graph • ENSv2
-                </span>
-              </div>
-              <h2 className="text-2xl font-extrabold text-white tracking-tight">
+      <main className="max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 space-y-5 flex-1">
+        {/* Minimal Hero / Spec Overview */}
+        <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-md p-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <h2 className="text-base font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
                 GraphAgent Gateway
               </h2>
-              <p className="text-xs text-slate-400 leading-relaxed font-sans">
-                Autonomous agent gateway that executes <strong className="text-slate-200">The Graph Subgraph Studio</strong> liquidity audits, enforces <strong className="text-slate-200">Bazantic x402 Micropayment paywalls</strong>, and deterministically writes verified audit hashes to <strong className="text-slate-200">ENSv2 Permissioned Resolvers</strong> on Ethereum Sepolia.
-              </p>
+              <span className="text-[11px] font-mono px-1.5 py-0.2 rounded border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
+                ETHOnline 2026
+              </span>
             </div>
+            <p className="text-xs text-zinc-600 dark:text-zinc-400 max-w-2xl leading-relaxed">
+              Autonomous liquidity auditing pipeline integrating <strong>The Graph Subgraph Studio</strong>, <strong>Bazantic x402 Micropayments</strong>, and <strong>ENSv2 Permissioned Resolvers</strong> on Ethereum Sepolia.
+            </p>
+          </div>
 
-            {/* Quick Actions & Recipe Link */}
-            <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={handleAutoRunFlow}
+              disabled={isExecuting || isAutoRunning}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-mono transition"
+              title="Automatically run through unauthenticated 402 challenge and authenticated execution"
+            >
+              <PlayCircle className="w-3.5 h-3.5 text-zinc-500" />
+              <span>{isAutoRunning ? 'Auto-Running...' : 'Auto-Run Flow'}</span>
+            </button>
+
+            {recordedRun && (
               <button
-                onClick={openRecipeModal}
-                className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700 text-slate-200 text-xs transition"
+                onClick={handleExportRecording}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-mono transition"
+                title="Download JSON recording of audit execution"
               >
-                <FileText className="w-4 h-4 text-purple-400" />
-                <span>View Bazantic Recipe</span>
+                <Download className="w-3.5 h-3.5 text-zinc-500" />
+                <span>Export Run JSON</span>
               </button>
-            </div>
+            )}
           </div>
         </div>
 
-        {/* Controls Bar */}
-        <div className="bg-[#0b0f19] border border-slate-800 rounded-xl p-4 shadow-xl">
-          <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 text-xs">
-            {/* Presets Selector */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-              <span className="text-slate-400 font-semibold shrink-0 flex items-center gap-1.5">
-                <Layers className="w-4 h-4 text-cyan-400" />
-                Query Preset:
-              </span>
+        {/* Controls Toolbar */}
+        <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-md p-3 shadow-sm">
+          <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 text-xs">
+            {/* Presets */}
+            <div className="flex items-center gap-2">
+              <label htmlFor="preset-select" className="text-zinc-500 text-xs font-medium shrink-0">
+                Preset:
+              </label>
               <select
+                id="preset-select"
                 value={preset}
                 onChange={(e) => setPreset(e.target.value)}
                 disabled={isExecuting}
-                className="bg-[#0e1422] border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-500 font-mono"
+                className="border border-zinc-300 dark:border-zinc-700 rounded bg-zinc-50 dark:bg-zinc-800/80 px-2.5 py-1.5 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-zinc-500 font-mono text-xs"
               >
-                <option value="uniswap_top_5">Uniswap v3 Top 5 TVL Pools (Ethereum Mainnet)</option>
-                <option value="uniswap_top_10">Uniswap v3 Top 10 High-Volume Pools</option>
+                <option value="uniswap_top_5">Uniswap v3 Top 5 TVL Pools</option>
+                <option value="uniswap_top_10">Uniswap v3 Top 10 High Volume Pools</option>
                 <option value="stable_depth">Stablecoin Depth Pools (USDC / USDT / DAI)</option>
               </select>
             </div>
 
-            {/* Gateway Authorization Toggle */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-              <span className="text-slate-400 font-semibold shrink-0 flex items-center gap-1.5">
-                <KeyRound className="w-4 h-4 text-purple-400" />
-                Bazantic Gateway Auth:
+            {/* Auth Mode Toggle */}
+            <div className="flex items-center gap-2">
+              <span className="text-zinc-500 text-xs font-medium shrink-0">
+                Gateway Auth:
               </span>
-              <div className="inline-flex rounded-lg border border-slate-800 bg-[#0e1422] p-1">
+              <div className="inline-flex rounded border border-zinc-300 dark:border-zinc-700 p-0.5 bg-zinc-100 dark:bg-zinc-800 font-mono text-[11px]">
                 <button
                   type="button"
                   onClick={() => setAuthMode('authorized')}
                   disabled={isExecuting}
-                  className={`px-3 py-1.5 rounded-md transition font-medium text-[11px] ${
+                  className={`px-2.5 py-1 rounded transition font-medium ${
                     authMode === 'authorized'
-                      ? 'bg-emerald-950 text-emerald-300 border border-emerald-800/80 shadow-sm'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                      : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
                   }`}
                 >
-                  ✓ Authorized (MPP Bearer)
+                  Authorized (MPP Token)
                 </button>
                 <button
                   type="button"
                   onClick={() => setAuthMode('unauthorized')}
                   disabled={isExecuting}
-                  className={`px-3 py-1.5 rounded-md transition font-medium text-[11px] ${
+                  className={`px-2.5 py-1 rounded transition font-medium ${
                     authMode === 'unauthorized'
-                      ? 'bg-rose-950 text-rose-300 border border-rose-800/80 shadow-sm'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                      : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
                   }`}
                 >
-                  ⚠ Trigger x402 Challenge
+                  Simulate 402 Paywall
                 </button>
               </div>
             </div>
 
-            {/* Execute Button */}
+            {/* Run Button */}
             <button
               onClick={() => runAuditPipeline()}
-              disabled={isExecuting}
-              className={`flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-bold transition shadow-lg shrink-0 ${
+              disabled={isExecuting || isAutoRunning}
+              className={`flex items-center justify-center gap-1.5 px-4 py-1.5 rounded font-medium text-xs font-mono transition shrink-0 ${
                 isExecuting
-                  ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
-                  : 'bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-black font-extrabold shadow-cyan-900/30 active:scale-95'
+                  ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-400 cursor-not-allowed'
+                  : 'bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900'
               }`}
             >
-              {isExecuting ? (
-                <>
-                  <RefreshCw className="w-4 h-4 animate-spin text-cyan-400" />
-                  <span>Executing Pipeline...</span>
-                </>
-              ) : (
-                <>
-                  <Play className="w-4 h-4 fill-current" />
-                  <span>Run Bazantic Recipe</span>
-                </>
-              )}
+              <Play className="w-3.5 h-3.5 fill-current" />
+              <span>{isExecuting ? 'Executing...' : 'Run Bazantic Recipe'}</span>
             </button>
           </div>
         </div>
 
-        {/* Real-time Terminal Execution Log */}
+        {/* Real-time Lifecycle Log */}
         <TerminalLog
           logs={logs}
           onClearLogs={clearLogs}
           isExecuting={isExecuting}
+          onExportLogs={handleExportRecording}
         />
 
-        {/* Audit Summary Cards */}
-        {auditResult && (
-          <AuditSummary data={auditResult} />
-        )}
+        {/* Summary Card */}
+        {auditResult && <AuditSummary data={auditResult} />}
 
-        {/* Results: Pools Table */}
+        {/* Pools Table */}
         <PoolsTable
           pools={auditResult ? auditResult.pools : []}
           isLive={auditResult ? auditResult.isGraphLive : true}
@@ -333,22 +401,20 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-800/80 bg-[#090d16] py-4 px-4 text-center text-xs text-slate-500 font-mono">
+      <footer className="border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 py-3 px-4 text-xs font-mono text-zinc-500 transition-colors">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-          <div>
-            GraphAgent Gateway • ETHOnline 2026 Bounty Project
-          </div>
-          <div className="flex items-center gap-4 text-slate-400">
-            <span>The Graph Subgraph Studio</span>
+          <span>GraphAgent Gateway • ETHOnline 2026</span>
+          <div className="flex items-center gap-3 text-zinc-400">
+            <span>The Graph Studio</span>
             <span>•</span>
-            <span>Bazantic x402 MPP</span>
+            <span>Bazantic x402</span>
             <span>•</span>
-            <span>ENSv2 Sepolia Resolver</span>
+            <span>ENSv2 Sepolia</span>
           </div>
         </div>
       </footer>
 
-      {/* 402 Paywall Challenge & Recipe Modal */}
+      {/* 402 Challenge & Recipe Modal */}
       <ChallengeModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

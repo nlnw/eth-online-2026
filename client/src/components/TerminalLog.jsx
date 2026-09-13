@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
-import { Terminal, Trash2, ArrowDownCircle } from 'lucide-react';
+import { Terminal, Trash2, Download } from 'lucide-react';
 
-export default function TerminalLog({ logs, onClearLogs, isExecuting }) {
+export default function TerminalLog({ logs, onClearLogs, isExecuting, onExportLogs }) {
   const terminalEndRef = useRef(null);
 
   useEffect(() => {
@@ -10,73 +10,78 @@ export default function TerminalLog({ logs, onClearLogs, isExecuting }) {
     }
   }, [logs]);
 
-  const getTagColor = (tag) => {
+  const getTagBadge = (tag) => {
     switch (tag) {
       case 'GATEWAY':
-        return 'text-cyan-400 bg-cyan-950/60 border-cyan-800/60';
+        return 'text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700';
       case 'x402_AUTH':
-        return 'text-purple-400 bg-purple-950/60 border-purple-800/60';
+        return 'text-zinc-800 dark:text-zinc-300 bg-zinc-200/70 dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700';
       case 'THE_GRAPH':
-        return 'text-amber-400 bg-amber-950/60 border-amber-800/60';
+        return 'text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-900';
       case 'DETERMINISTIC_AUDIT':
-        return 'text-emerald-400 bg-emerald-950/60 border-emerald-800/60';
+        return 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900';
       case 'ENSv2':
-        return 'text-blue-400 bg-blue-950/60 border-blue-800/60';
+        return 'text-indigo-700 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 border-indigo-200 dark:border-indigo-900';
       case 'ERROR':
-        return 'text-rose-400 bg-rose-950/60 border-rose-800/60';
+        return 'text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-950/40 border-red-200 dark:border-red-900';
       default:
-        return 'text-slate-400 bg-slate-800 border-slate-700';
+        return 'text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700';
     }
   };
 
   return (
-    <div className="bg-[#0b0f19] border border-slate-800 rounded-xl overflow-hidden shadow-2xl flex flex-col font-mono text-xs">
-      {/* Terminal Title Bar */}
-      <div className="bg-[#0e1422] px-4 py-2.5 border-b border-slate-800 flex items-center justify-between">
+    <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-md overflow-hidden font-mono text-xs shadow-sm">
+      {/* Console Header Bar */}
+      <div className="bg-zinc-50 dark:bg-zinc-950/80 px-4 py-2 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-full bg-rose-500/80 inline-block" />
-            <span className="w-3 h-3 rounded-full bg-amber-500/80 inline-block" />
-            <span className="w-3 h-3 rounded-full bg-emerald-500/80 inline-block" />
-          </div>
-          <span className="text-slate-400 ml-2 font-mono flex items-center gap-1.5">
-            <Terminal className="w-3.5 h-3.5 text-cyan-400" />
-            <span>agent@graphagent-gateway:~$ ./run-recipe.sh</span>
+          <Terminal className="w-3.5 h-3.5 text-zinc-500" />
+          <span className="text-zinc-700 dark:text-zinc-300 font-medium text-[11px]">
+            Execution Lifecycle Log
           </span>
+          <span className="text-zinc-400 text-[11px]">({logs.length} events)</span>
         </div>
 
         <div className="flex items-center gap-2">
           {isExecuting && (
-            <span className="flex items-center gap-1.5 text-[11px] text-cyan-400">
-              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-              Executing Pipeline...
+            <span className="flex items-center gap-1.5 text-[11px] text-zinc-600 dark:text-zinc-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-zinc-600 dark:bg-zinc-400 animate-pulse" />
+              Running...
             </span>
+          )}
+          {logs.length > 0 && onExportLogs && (
+            <button
+              onClick={onExportLogs}
+              className="p-1 rounded text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition"
+              title="Download run log record (JSON)"
+            >
+              <Download className="w-3.5 h-3.5" />
+            </button>
           )}
           <button
             onClick={onClearLogs}
-            className="text-slate-500 hover:text-slate-300 transition p-1"
-            title="Clear Terminal Output"
+            className="p-1 rounded text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition"
+            title="Clear logs"
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
 
-      {/* Terminal Output Area */}
-      <div className="p-4 h-72 overflow-y-auto space-y-2 bg-[#080c14]/95 select-text font-mono text-[12px] leading-relaxed">
+      {/* Console Output Area */}
+      <div className="p-3.5 h-64 overflow-y-auto space-y-1.5 bg-zinc-50/50 dark:bg-zinc-950 text-[11px] leading-relaxed">
         {logs.length === 0 ? (
-          <div className="text-slate-500 italic py-8 text-center">
-            Terminal ready. Click "Run Bazantic Recipe" to execute the pipeline.
+          <div className="text-zinc-400 dark:text-zinc-600 py-10 text-center font-sans">
+            Ready to execute. Click "Run Bazantic Recipe" or "Auto-Run Full Flow".
           </div>
         ) : (
           logs.map((item, idx) => (
-            <div key={idx} className="flex items-start gap-2.5 animate-fadeIn">
-              <span className="text-slate-500 text-[11px] shrink-0 select-none">
+            <div key={idx} className="flex items-start gap-2">
+              <span className="text-zinc-400 dark:text-zinc-600 text-[10px] shrink-0 select-none pt-0.5">
                 {item.timestamp}
               </span>
               {item.tag && (
                 <span
-                  className={`px-1.5 py-0.5 rounded text-[10px] uppercase font-bold border shrink-0 ${getTagColor(
+                  className={`px-1.5 py-0.2 rounded text-[9px] uppercase font-semibold border shrink-0 ${getTagBadge(
                     item.tag
                   )}`}
                 >
@@ -86,12 +91,12 @@ export default function TerminalLog({ logs, onClearLogs, isExecuting }) {
               <span
                 className={`break-all ${
                   item.type === 'error'
-                    ? 'text-rose-400 font-semibold'
+                    ? 'text-red-600 dark:text-red-400 font-medium'
                     : item.type === 'success'
-                    ? 'text-emerald-300'
+                    ? 'text-zinc-800 dark:text-zinc-200'
                     : item.type === 'warn'
-                    ? 'text-amber-300'
-                    : 'text-slate-300'
+                    ? 'text-amber-700 dark:text-amber-400'
+                    : 'text-zinc-600 dark:text-zinc-400'
                 }`}
               >
                 {item.text}
@@ -102,18 +107,18 @@ export default function TerminalLog({ logs, onClearLogs, isExecuting }) {
         <div ref={terminalEndRef} />
       </div>
 
-      {/* Terminal Footer info */}
-      <div className="bg-[#0a0e1a] px-4 py-1.5 border-t border-slate-800/80 text-[11px] text-slate-500 flex items-center justify-between">
+      {/* Console Footer */}
+      <div className="bg-zinc-50 dark:bg-zinc-950/80 px-4 py-1.5 border-t border-zinc-200 dark:border-zinc-800 text-[10px] text-zinc-500 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span>Lifecycle: 4 Stages</span>
-          <span>•</span>
-          <span className="text-purple-400">1. x402 Micropayment</span>
-          <span>•</span>
-          <span className="text-amber-400">2. The Graph Studio</span>
-          <span>•</span>
-          <span className="text-blue-400">3. ENSv2 Resolver</span>
+          <span>Stages: 1. Gateway Request</span>
+          <span>&gt;</span>
+          <span>2. x402 Check</span>
+          <span>&gt;</span>
+          <span>3. Subgraph Studio</span>
+          <span>&gt;</span>
+          <span>4. ENSv2 Attestation</span>
         </div>
-        <span className="text-slate-400">UTF-8 / JSON-RPC</span>
+        <span>Sepolia Testnet</span>
       </div>
     </div>
   );

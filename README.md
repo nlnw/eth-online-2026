@@ -1,4 +1,4 @@
-# ⚡ GraphAgent Gateway
+# GraphAgent Gateway
 
 > **ETHOnline 2026 Bounty Submission**
 > 
@@ -9,7 +9,7 @@
 
 ---
 
-## 🏛️ System Architecture
+## System Architecture
 
 ```mermaid
 flowchart TD
@@ -57,7 +57,7 @@ flowchart TD
 
 ---
 
-## 🏆 Bounty Track Integrations
+## Bounty Track Integrations
 
 ### 1. Bazantic — Best Recipe using Sponsor APIs (x402/MPP Gateway)
 - **x402 Micropayment Protocol Gateway:** The gateway intercepts all autonomous execution requests at `POST /api/run-audit`. If a client makes an unauthenticated request, the server responds with an RFC-compliant `HTTP 402 Payment Required` challenge containing structured payment details:
@@ -84,7 +84,7 @@ flowchart TD
 
 ---
 
-## 🚀 Quickstart & Local Setup
+## Quickstart & Local Setup
 
 ### Prerequisites
 - Node.js (v18+ or v20+)
@@ -112,39 +112,41 @@ Default parameters in `.env`:
 ### 3. Run Locally
 Run both backend server and frontend client concurrently:
 ```bash
-npm run dev
+### 4. Automated Flow Execution & Recording
+To run through the complete unauthenticated-to-authenticated lifecycle and record the run:
+```bash
+npm run record
 ```
-
-The application will be live at:
-- **Client (Developer Terminal):** `http://localhost:5173`
-- **Server (Gateway & API):** `http://localhost:8080`
+This generates a structured execution recording in `recordings/latest_flow_record.json`.
 
 ---
 
-## 🕹️ Interactive Demo Walkthrough
+## Interactive Demo Walkthrough
 
-1. **Test x402 Paywall Challenge:**
-   - Toggle **Bazantic Gateway Auth** to `⚠ Trigger x402 Challenge`.
+1. **Automated Flow & Record:**
+   - In the frontend top bar or via CLI (`npm run record`), click **Auto-Run Flow**.
+   - The runner tests the HTTP 402 challenge, unlocks via the Bazantic MPP session, runs The Graph query, writes the ENSv2 attestation, and produces an exportable JSON record.
+   - Click **Export Run JSON** to download the signed lifecycle record.
+
+2. **Test x402 Paywall Challenge:**
+   - Toggle **Gateway Auth** to `Simulate 402 Paywall`.
    - Click **Run Bazantic Recipe**.
-   - Watch the terminal intercept the request and trigger the **HTTP 402 Payment Required** inspector modal showing raw x402 headers and 0.001 ETH payment details.
-   - Click **Authorize & Pay 0.001 ETH via Bazantic MPP** to automatically pass valid credentials.
+   - Inspect the **HTTP 402 Payment Required** challenge details.
+   - Click **Pass Bazantic MPP Bearer Token** to re-execute with valid credentials.
 
-2. **Execute Full 4-Stage Lifecycle:**
-   - With auth set to `✓ Authorized (MPP Bearer)`, click **Run Bazantic Recipe**.
-   - Observe real-time terminal logs displaying:
-     1. Gateway request initiation.
-     2. x402 paywall authorization check.
-     3. The Graph live GraphQL query execution.
-     4. ENSv2 Sepolia textRecord attestation write.
-   - Review the generated **Deterministic Report Hash** and **Sepolia Transaction Hash**.
-   - Inspect the audited Uniswap v3 pool data table with real-time TVL, 24h volume, and fee tier breakdown.
+3. **Execute Full Lifecycle:**
+   - Set auth to `Authorized (MPP Token)` and click **Run Bazantic Recipe**.
+   - Inspect real-time console events, deterministic report hash, and Sepolia transaction record.
+
+4. **Light / Dark Mode:**
+   - Click the theme toggle button in the top right to switch between minimal light and dark modes.
 
 3. **Inspect Bazantic Recipe:**
    - Click **View Bazantic Recipe** in the top header or banner to inspect the declarative schema (`recipe.json`).
 
 ---
 
-## 📜 Repository Structure
+## Repository Structure
 
 ```
 .

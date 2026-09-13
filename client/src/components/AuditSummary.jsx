@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, CheckCircle2, Hash, FileCheck, ExternalLink, Copy, Check, Activity } from 'lucide-react';
+import { ExternalLink, Copy, Check } from 'lucide-react';
 
 export default function AuditSummary({ data }) {
   const [copiedHash, setCopiedHash] = useState(false);
@@ -12,7 +12,7 @@ export default function AuditSummary({ data }) {
   const copyText = (text, setFn) => {
     navigator.clipboard.writeText(text);
     setFn(true);
-    setTimeout(() => setFn(false), 2000);
+    setTimeout(() => setFn(false), 1500);
   };
 
   const formatUSD = (val) => {
@@ -26,165 +26,125 @@ export default function AuditSummary({ data }) {
   };
 
   return (
-    <div className="space-y-4 font-mono">
-      {/* Metric Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {/* Total TVL */}
-        <div className="bg-[#0b0f19] border border-slate-800 rounded-xl p-4 shadow-lg">
-          <div className="text-xs text-slate-400 flex items-center justify-between mb-1">
-            <span>Audited TVL</span>
-            <Activity className="w-4 h-4 text-cyan-400" />
+    <div className="space-y-3 font-sans">
+      {/* 4 Stat Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+        <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-md p-3 shadow-sm">
+          <div className="text-zinc-500 dark:text-zinc-400 text-[11px] mb-1">
+            Total Audited TVL
           </div>
-          <div className="text-xl font-bold text-white tracking-tight">
+          <div className="text-base font-semibold text-zinc-900 dark:text-zinc-100 font-mono">
             {formatUSD(summary?.totalTvlUSD || 788981478)}
           </div>
-          <div className="text-[11px] text-emerald-400 mt-1 flex items-center gap-1">
-            <span>✓</span> Indexed via Subgraph Studio
+          <div className="text-[10px] text-zinc-500 font-mono mt-0.5">
+            Uniswap v3 Subgraph
           </div>
         </div>
 
-        {/* 24h Volume */}
-        <div className="bg-[#0b0f19] border border-slate-800 rounded-xl p-4 shadow-lg">
-          <div className="text-xs text-slate-400 flex items-center justify-between mb-1">
-            <span>24h Aggregate Volume</span>
-            <span className="text-emerald-400 text-xs">● Live</span>
+        <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-md p-3 shadow-sm">
+          <div className="text-zinc-500 dark:text-zinc-400 text-[11px] mb-1">
+            24h Volume
           </div>
-          <div className="text-xl font-bold text-emerald-400 tracking-tight">
+          <div className="text-base font-semibold text-zinc-900 dark:text-zinc-100 font-mono">
             {formatUSD(summary?.total24hVolumeUSD || 446316290)}
           </div>
-          <div className="text-[11px] text-slate-400 mt-1">
-            Velocity Ratio: <span className="text-cyan-300 font-semibold">{summary?.velocityRatio || '0.5657'}</span>
+          <div className="text-[10px] text-zinc-500 font-mono mt-0.5">
+            Velocity: {summary?.velocityRatio || '0.5657'}
           </div>
         </div>
 
-        {/* Liquidity Health Score */}
-        <div className="bg-[#0b0f19] border border-slate-800 rounded-xl p-4 shadow-lg">
-          <div className="text-xs text-slate-400 flex items-center justify-between mb-1">
-            <span>Health & Slippage Score</span>
-            <Shield className="w-4 h-4 text-emerald-400" />
+        <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-md p-3 shadow-sm">
+          <div className="text-zinc-500 dark:text-zinc-400 text-[11px] mb-1">
+            Liquidity Score
           </div>
-          <div className="text-xl font-bold text-cyan-400 tracking-tight flex items-baseline gap-1">
-            {summary?.liquidityScore || '98.5'}
-            <span className="text-xs text-slate-500 font-normal">/ 100</span>
+          <div className="text-base font-semibold text-zinc-900 dark:text-zinc-100 font-mono">
+            {summary?.liquidityScore || '98.5'}<span className="text-xs text-zinc-400 font-normal"> / 100</span>
           </div>
-          <div className="text-[11px] text-slate-300 mt-1 flex items-center gap-1">
-            <span className="px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-400 border border-emerald-800/60 text-[10px]">
-              {summary?.riskLevel || 'OPTIMAL_DEEP_LIQUIDITY'}
-            </span>
+          <div className="text-[10px] text-zinc-500 font-mono mt-0.5">
+            {summary?.riskLevel || 'OPTIMAL'}
           </div>
         </div>
 
-        {/* ENSv2 Attestation Status */}
-        <div className="bg-[#0b0f19] border border-slate-800 rounded-xl p-4 shadow-lg">
-          <div className="text-xs text-slate-400 flex items-center justify-between mb-1">
-            <span>ENSv2 Sepolia Attestation</span>
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+        <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-md p-3 shadow-sm">
+          <div className="text-zinc-500 dark:text-zinc-400 text-[11px] mb-1">
+            Attestation State
           </div>
-          <div className="text-sm font-bold text-white truncate" title={agentName}>
+          <div className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 font-mono truncate">
             {agentName || 'oracle.agentcorp.eth'}
           </div>
-          <div className="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-emerald-400" />
-            <span className="text-slate-300">
-              {ensAttestation?.isSimulated ? 'Simulated Sepolia State' : 'Sepolia Confirmed'}
-            </span>
+          <div className="text-[10px] text-zinc-500 font-mono mt-0.5 flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <span>{ensAttestation?.isSimulated ? 'Simulated Sepolia' : 'On-Chain Confirmed'}</span>
           </div>
         </div>
       </div>
 
-      {/* Attestation Verification Banner */}
-      <div className="bg-gradient-to-r from-cyan-950/40 via-slate-900 to-purple-950/40 border border-cyan-500/30 rounded-xl p-4 text-xs space-y-2">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
-          <div className="flex items-center gap-2">
-            <FileCheck className="w-4 h-4 text-cyan-400" />
-            <span className="font-semibold text-slate-200">
-              Deterministic keccak256 Audit Attestation
-            </span>
-            <span className="px-2 py-0.5 rounded bg-cyan-900/60 text-cyan-300 text-[10px] border border-cyan-700/50">
-              Integrity Verified
-            </span>
+      {/* Attestation Details Card */}
+      <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-md p-3 text-xs shadow-sm space-y-2">
+        <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
+          <div className="font-semibold text-zinc-900 dark:text-zinc-100 text-xs">
+            On-Chain Cryptographic Attestation
           </div>
-          <div className="text-slate-400 text-[11px]">
-            Target Subname: <span className="text-emerald-400 font-bold">{agentName}</span>
+          <div className="text-[11px] text-zinc-500 font-mono">
+            Target: <span className="text-zinc-800 dark:text-zinc-200 font-medium">{agentName}</span>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs font-mono">
           {/* Report Hash */}
-          <div className="bg-slate-950/80 border border-slate-800/80 rounded-lg p-2.5">
-            <div className="text-[11px] text-slate-400 mb-1 flex items-center justify-between">
-              <span className="flex items-center gap-1">
-                <Hash className="w-3 h-3 text-cyan-400" />
-                <span>Deterministic Report Hash:</span>
-              </span>
+          <div className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded p-2.5">
+            <div className="flex items-center justify-between text-zinc-500 text-[10px] mb-1">
+              <span>keccak256 Deterministic Report Hash:</span>
               <button
                 onClick={() => copyText(reportHash, setCopiedHash)}
-                className="text-slate-400 hover:text-white transition flex items-center gap-1 text-[10px]"
+                className="hover:text-zinc-900 dark:hover:text-zinc-100 transition flex items-center gap-1"
               >
-                {copiedHash ? (
-                  <>
-                    <Check className="w-3 h-3 text-emerald-400" />
-                    <span className="text-emerald-400">Copied</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-3 h-3" />
-                    <span>Copy</span>
-                  </>
-                )}
+                {copiedHash ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                <span>{copiedHash ? 'Copied' : 'Copy'}</span>
               </button>
             </div>
-            <div className="font-mono text-cyan-300 break-all text-[11px]">
+            <div className="text-zinc-800 dark:text-zinc-200 break-all text-[11px]">
               {reportHash}
             </div>
           </div>
 
           {/* Sepolia Tx Hash */}
-          <div className="bg-slate-950/80 border border-slate-800/80 rounded-lg p-2.5">
-            <div className="text-[11px] text-slate-400 mb-1 flex items-center justify-between">
+          <div className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded p-2.5">
+            <div className="flex items-center justify-between text-zinc-500 text-[10px] mb-1">
               <span>ENSv2 Sepolia Transaction Hash:</span>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => copyText(txHash, setCopiedTx)}
-                  className="text-slate-400 hover:text-white transition flex items-center gap-1 text-[10px]"
+                  className="hover:text-zinc-900 dark:hover:text-zinc-100 transition flex items-center gap-1"
                 >
-                  {copiedTx ? (
-                    <>
-                      <Check className="w-3 h-3 text-emerald-400" />
-                      <span className="text-emerald-400">Copied</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-3 h-3" />
-                      <span>Copy</span>
-                    </>
-                  )}
+                  {copiedTx ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                  <span>{copiedTx ? 'Copied' : 'Copy'}</span>
                 </button>
                 <a
                   href={`https://sepolia.etherscan.io/tx/${txHash}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-cyan-400 hover:text-cyan-300 transition flex items-center gap-1 text-[10px]"
+                  className="hover:text-zinc-900 dark:hover:text-zinc-100 transition flex items-center gap-0.5"
                 >
                   <ExternalLink className="w-3 h-3" />
                   <span>Explorer</span>
                 </a>
               </div>
             </div>
-            <div className="font-mono text-emerald-400 break-all text-[11px]">
+            <div className="text-zinc-800 dark:text-zinc-200 break-all text-[11px]">
               {txHash}
             </div>
           </div>
         </div>
 
-        {/* Record Key Details */}
-        <div className="text-[11px] text-slate-400 flex flex-wrap items-center gap-3 pt-1">
+        {/* Record Key Footer */}
+        <div className="flex flex-wrap items-center gap-3 pt-1 text-[11px] font-mono text-zinc-500">
           <div>
-            Record Key: <code className="text-amber-300 bg-slate-900 px-1 py-0.5 rounded border border-slate-800">{recordKey || "records['last_audit_hash']"}</code>
+            Record Key: <code className="text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 px-1 py-0.2 rounded">{recordKey || "records['last_audit_hash']"}</code>
           </div>
           <span>•</span>
           <div>
-            Permissioned Resolver: <code className="text-purple-300 bg-slate-900 px-1 py-0.5 rounded border border-slate-800">{resolverAddress || "0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41"}</code>
+            Resolver: <code className="text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 px-1 py-0.2 rounded">{resolverAddress}</code>
           </div>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ExternalLink, Copy, Check, TrendingUp, Layers } from 'lucide-react';
+import { ExternalLink, Copy, Check } from 'lucide-react';
 
 export default function PoolsTable({ pools, isLive }) {
   const [copiedId, setCopiedId] = useState(null);
@@ -7,7 +7,7 @@ export default function PoolsTable({ pools, isLive }) {
   const copyAddress = (address) => {
     navigator.clipboard.writeText(address);
     setCopiedId(address);
-    setTimeout(() => setCopiedId(null), 2000);
+    setTimeout(() => setCopiedId(null), 1500);
   };
 
   const formatUSD = (val) => {
@@ -22,49 +22,44 @@ export default function PoolsTable({ pools, isLive }) {
 
   if (!pools || pools.length === 0) {
     return (
-      <div className="bg-[#0b0f19] border border-slate-800 rounded-xl p-8 text-center text-slate-500 font-mono text-sm">
-        No pool data retrieved yet. Run the Bazantic Recipe to query The Graph Subgraph Studio.
+      <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-md p-8 text-center text-zinc-400 dark:text-zinc-500 font-sans text-xs">
+        No pool data loaded. Execute the Bazantic Recipe to query The Graph Subgraph Studio.
       </div>
     );
   }
 
   return (
-    <div className="bg-[#0b0f19] border border-slate-800 rounded-xl overflow-hidden shadow-xl font-mono">
-      <div className="px-5 py-3 border-b border-slate-800 bg-[#0e1422] flex items-center justify-between">
+    <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-md overflow-hidden shadow-sm">
+      <div className="px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950/60 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Layers className="w-4 h-4 text-cyan-400" />
-          <h2 className="text-sm font-semibold text-slate-200">
-            The Graph Subgraph Studio — Audited Liquidity Pools
-          </h2>
-          <span className="bg-slate-800 text-slate-300 text-xs px-2 py-0.5 rounded">
-            {pools.length} Pools
+          <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 font-sans">
+            Audited Liquidity Pools
+          </span>
+          <span className="bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 text-[10px] font-mono px-1.5 py-0.2 rounded">
+            {pools.length}
           </span>
         </div>
-        <div className="flex items-center gap-2 text-xs">
-          <span className="text-slate-500">Source:</span>
-          <span className={`px-2 py-0.5 rounded text-[11px] font-semibold border ${
-            isLive
-              ? 'bg-emerald-950/60 text-emerald-400 border-emerald-800/60'
-              : 'bg-cyan-950/60 text-cyan-400 border-cyan-800/60'
-          }`}>
-            {isLive ? 'Live Subgraph Studio' : 'Verified Subgraph Studio Snapshot'}
+        <div className="flex items-center gap-1.5 text-[11px] font-mono text-zinc-500">
+          <span>Source:</span>
+          <span className="text-zinc-800 dark:text-zinc-200 font-medium">
+            {isLive ? 'The Graph Subgraph Studio (Live)' : 'The Graph Subgraph Studio (Snapshot)'}
           </span>
         </div>
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full text-left text-xs">
-          <thead className="bg-[#090d16] text-slate-400 uppercase tracking-wider text-[11px] border-b border-slate-800">
+        <table className="w-full text-left text-xs font-mono">
+          <thead className="bg-zinc-50/70 dark:bg-zinc-950/40 text-zinc-500 text-[10px] uppercase tracking-wider border-b border-zinc-200 dark:border-zinc-800 font-sans">
             <tr>
-              <th className="px-5 py-3 font-semibold">Pool Pair</th>
-              <th className="px-5 py-3 font-semibold">Fee Tier</th>
-              <th className="px-5 py-3 font-semibold">Pool Address</th>
-              <th className="px-5 py-3 font-semibold text-right">Total Value Locked (USD)</th>
-              <th className="px-5 py-3 font-semibold text-right">24h Volume (USD)</th>
-              <th className="px-5 py-3 font-semibold text-center">Audit Status</th>
+              <th className="px-4 py-2.5 font-medium">Pair</th>
+              <th className="px-4 py-2.5 font-medium">Fee</th>
+              <th className="px-4 py-2.5 font-medium">Address</th>
+              <th className="px-4 py-2.5 font-medium text-right">TVL (USD)</th>
+              <th className="px-4 py-2.5 font-medium text-right">24h Volume</th>
+              <th className="px-4 py-2.5 font-medium text-center">Status</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/60">
+          <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800/80">
             {pools.map((pool, idx) => {
               const pairLabel = `${pool.token0?.symbol || 'TKN0'} / ${pool.token1?.symbol || 'TKN1'}`;
               const feePct = pool.feeTier ? `${Number(pool.feeTier) / 10000}%` : '0.05%';
@@ -73,70 +68,61 @@ export default function PoolsTable({ pools, isLive }) {
               const address = pool.id || pool.address;
 
               return (
-                <tr key={idx} className="hover:bg-slate-900/40 transition">
-                  {/* Pair Name */}
-                  <td className="px-5 py-3.5 font-bold text-slate-100 flex items-center gap-2">
-                    <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-cyan-950 to-slate-900 border border-cyan-800/40 flex items-center justify-center text-cyan-400 font-mono text-[10px]">
-                      {pool.token0?.symbol?.slice(0, 2) || 'P'}
-                    </span>
-                    <div>
-                      <div className="text-white text-xs">{pairLabel}</div>
-                      <div className="text-[10px] text-slate-500 font-normal">
-                        {pool.token0?.name} • {pool.token1?.name}
-                      </div>
+                <tr key={idx} className="hover:bg-zinc-50/80 dark:hover:bg-zinc-800/40 transition-colors">
+                  <td className="px-4 py-2.5">
+                    <div className="font-semibold text-zinc-900 dark:text-zinc-100 font-mono text-xs">
+                      {pairLabel}
+                    </div>
+                    <div className="text-[10px] text-zinc-500 font-sans">
+                      {pool.token0?.name} • {pool.token1?.name}
                     </div>
                   </td>
 
-                  {/* Fee Tier */}
-                  <td className="px-5 py-3.5">
-                    <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-mono text-[11px] border border-slate-700">
+                  <td className="px-4 py-2.5">
+                    <span className="px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px]">
                       {feePct}
                     </span>
                   </td>
 
-                  {/* Address */}
-                  <td className="px-5 py-3.5">
-                    <div className="flex items-center gap-1.5 text-slate-400">
-                      <span className="font-mono text-[11px]">
-                        {address ? `${address.substring(0, 6)}...${address.substring(address.length - 4)}` : '0x...'}
+                  <td className="px-4 py-2.5">
+                    <div className="flex items-center gap-1.5 text-zinc-600 dark:text-zinc-400 text-[11px]">
+                      <span>
+                        {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : '0x...'}
                       </span>
                       <button
                         onClick={() => copyAddress(address)}
-                        className="hover:text-slate-200 transition"
-                        title="Copy pool contract address"
+                        className="hover:text-zinc-900 dark:hover:text-zinc-200 transition"
+                        title="Copy address"
                       >
                         {copiedId === address ? (
-                          <Check className="w-3 h-3 text-emerald-400" />
+                          <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                         ) : (
-                          <Copy className="w-3 h-3 text-slate-500" />
+                          <Copy className="w-3 h-3 text-zinc-400" />
                         )}
                       </button>
                       <a
                         href={`https://etherscan.io/address/${address}`}
                         target="_blank"
                         rel="noreferrer"
-                        className="hover:text-cyan-400 transition"
-                        title="View contract on Etherscan"
+                        className="hover:text-zinc-900 dark:hover:text-zinc-200 transition"
+                        title="View on Etherscan"
                       >
-                        <ExternalLink className="w-3 h-3 text-slate-500" />
+                        <ExternalLink className="w-3 h-3 text-zinc-400" />
                       </a>
                     </div>
                   </td>
 
-                  {/* TVL */}
-                  <td className="px-5 py-3.5 text-right font-semibold text-emerald-300">
+                  <td className="px-4 py-2.5 text-right font-medium text-zinc-900 dark:text-zinc-100">
                     {formatUSD(tvl)}
                   </td>
 
-                  {/* Volume */}
-                  <td className="px-5 py-3.5 text-right font-medium text-slate-200">
+                  <td className="px-4 py-2.5 text-right text-zinc-600 dark:text-zinc-400">
                     {formatUSD(vol)}
                   </td>
 
-                  {/* Audit Status */}
-                  <td className="px-5 py-3.5 text-center">
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-950/70 text-emerald-400 border border-emerald-800/60">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  <td className="px-4 py-2.5 text-center">
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                      <span className="w-1 h-1 rounded-full bg-emerald-500" />
                       Attested
                     </span>
                   </td>
