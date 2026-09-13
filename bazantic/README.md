@@ -1,8 +1,8 @@
 # Bazantic x402 Gateway & Recipe Specification
 
-This directory contains the declarative **Bazantic Recipe** configuration and schema definition for GraphAgent Gateway.
+This directory contains the declarative **Bazantic Recipe** configuration and schema definition for Sentinel402 Gateway.
 
-## How Bazantic Works in GraphAgent Gateway
+## How Bazantic Works in Sentinel402 Gateway
 
 1. **x402 / MPP Micropayment Gateway:**
    - Every API request targeting the agent's computation pipeline (`POST /api/run-audit`) passes through the Bazantic Gateway filter.
@@ -18,7 +18,7 @@ This directory contains the declarative **Bazantic Recipe** configuration and sc
    - Bazantic Recipes orchestrate multi-step autonomous agent operations:
      - **Step 1 (`ingest_gateway_credentials`)**: Ingests and authenticates the Bazantic Bearer token (`Bearer bazantic_mpp_...`).
      - **Step 2 (`fetch_subgraph_liquidity`)**: Dispatches GraphQL queries to The Graph Subgraph Studio for Uniswap v3 pool volumes and TVL, then computes a deterministic `keccak256` audit report hash.
-     - **Step 3 (`ensv2_attestation_write`)**: Writes the audit hash to the ENSv2 Permissioned Resolver on Ethereum Sepolia for subname `oracle.agentcorp.eth`.
+     - **Step 3 (`ensv2_attestation_write`)**: Writes the audit hash to the ENSv2 Permissioned Resolver on Ethereum Sepolia for subname `auditor.sentinel402.eth`.
 
 3. **Recipe Validation:**
    - After the steps complete, the verification policy validates that the on-chain resolver record `records['last_audit_hash']` matches the deterministic report hash generated in Step 2.

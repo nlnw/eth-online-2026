@@ -14,7 +14,7 @@ const OUTPUT_FILE = join(__dirname, '..', 'recordings', 'latest_flow_record.json
 async function runRecordingFlow() {
   const startTime = Date.now();
   console.log(`\n======================================================`);
-  console.log(` GraphAgent Gateway - End-to-End Flow & Recording`);
+  console.log(` Sentinel402 Gateway - End-to-End Flow & Recording`);
   console.log(` Target Gateway: ${BASE_URL}`);
   console.log(`======================================================\n`);
 
@@ -146,7 +146,7 @@ async function runRecordingFlow() {
   const totalDurationMs = Date.now() - startTime;
   const flowRecord = {
     metadata: {
-      title: 'GraphAgent Gateway Audit & Attestation Flow Record',
+      title: 'Sentinel402 Gateway Audit & Attestation Flow Record',
       recordedAt: new Date().toISOString(),
       environment: 'Ethereum Sepolia Testnet',
       totalDurationMs,

@@ -1,12 +1,12 @@
 {
   "project": {
-    "name": "GraphAgent Gateway",
+    "name": "Sentinel402 Gateway",
     "version": "1.0.0",
     "network": "Ethereum Sepolia (Chain ID 11155111)",
-    "description": "Autonomous AI agent gateway integrating The Graph Subgraph Studio, Bazantic x402 Micropayments, and ENSv2 Permissioned Resolvers"
+    "description": "Autonomous AI agent sentinel integrating The Graph Subgraph Studio, Bazantic x402 Micropayments, and ENSv2 Permissioned Resolvers"
   },
   "ens": {
-    "subname": "oracle.agentcorp.eth",
+    "subname": "auditor.sentinel402.eth",
     "agentAddress": "0x6BB8f6Ca13DfC7f83E568E1080A66bFd81a6aC5f",
     "defaultResolver": "0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41",
     "recordKey": "records['last_audit_hash']",

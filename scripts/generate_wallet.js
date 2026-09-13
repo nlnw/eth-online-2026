@@ -16,13 +16,13 @@ function main() {
   const account = privateKeyToAccount(privateKey);
 
   console.log(`\n======================================================`);
-  console.log(` GraphAgent Gateway - Sepolia Testnet Keypair Generator`);
+  console.log(` Sentinel402 Gateway - Sepolia Testnet Keypair Generator`);
   console.log(`======================================================\n`);
 
   console.log(`Generated Address:   ${account.address}`);
   console.log(`Generated Key:       ${privateKey}`);
   console.log(`\nNetwork:             Ethereum Sepolia (Chain ID 11155111)`);
-  console.log(`Subname to Attest:   oracle.agentcorp.eth`);
+  console.log(`Subname to Attest:   auditor.sentinel402.eth`);
   console.log(`Resolver Contract:   0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41\n`);
 
   console.log(`Get Free Sepolia Testnet ETH:`);

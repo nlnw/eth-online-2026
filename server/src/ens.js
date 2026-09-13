@@ -14,7 +14,7 @@ import { sepolia } from 'viem/chains';
 import resolverMeta from '../contracts/ENSv2PermissionedResolver.json' with { type: 'json' };
 
 const RECORD_KEY = "records['last_audit_hash']";
-const DEFAULT_SUBNAME = "oracle.agentcorp.eth";
+const DEFAULT_SUBNAME = "auditor.sentinel402.eth";
 const DEFAULT_RESOLVER = "0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41";
 
 // In-memory state cache for verified ENSv2 records (ensures continuity in simulation/fallback)
@@ -86,7 +86,7 @@ export async function getAgentWalletStatus() {
 
 /**
  * Interacts with ENSv2 Permissioned Resolver on Ethereum Sepolia
- * Writes `records['last_audit_hash']` for `oracle.agentcorp.eth`
+ * Writes `records['last_audit_hash']` for `auditor.sentinel402.eth`
  * 
  * Provides automated fallback / simulation mode if RPC or keys are not funded
  * so tests and demo workflows never crash.

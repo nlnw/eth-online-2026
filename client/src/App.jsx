@@ -37,7 +37,7 @@ export default function App() {
   };
 
   const [agentProfile, setAgentProfile] = useState({
-    agentName: 'oracle.agentcorp.eth',
+    agentName: 'auditor.sentinel402.eth',
     resolverAddress: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
     agentAddress: '0x6BB8f6Ca13DfC7f83E568E1080A66bFd81a6aC5f',
     wallet: {
@@ -294,7 +294,7 @@ export default function App() {
           <div>
             <div className="flex items-center gap-2 mb-1">
               <h2 className="text-base font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-                GraphAgent Gateway
+                Sentinel402 Gateway
               </h2>
               <span className="text-[11px] font-mono px-1.5 py-0.2 rounded border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
                 ETHOnline 2026
@@ -446,7 +446,7 @@ export default function App() {
       {/* Footer */}
       <footer className="border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 py-3 px-4 text-xs font-mono text-zinc-500 transition-colors">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>GraphAgent Gateway • ETHOnline 2026</span>
+          <span>Sentinel402 Gateway • ETHOnline 2026</span>
           <div className="flex items-center gap-3 text-zinc-400">
             <span>The Graph Studio</span>
             <span>•</span>

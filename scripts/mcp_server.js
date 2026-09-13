@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * GraphAgent Gateway - Model Context Protocol (MCP) Server
+ * Sentinel402 Gateway - Model Context Protocol (MCP) Server
  * 
  * Target Bounty: The Graph — Best AI Tooling / AI Use Case (From Scratch)
  * 
@@ -13,9 +13,9 @@ import readline from 'readline';
 import { fetchSubgraphLiquidity } from '../server/src/graph.js';
 import { writeAuditAttestation, readAuditAttestation } from '../server/src/ens.js';
 
-const SERVER_NAME = 'graphagent-gateway-mcp';
+const SERVER_NAME = 'sentinel402-gateway-mcp';
 const SERVER_VERSION = '1.0.0';
-const DEFAULT_SUBNAME = 'oracle.agentcorp.eth';
+const DEFAULT_SUBNAME = 'auditor.sentinel402.eth';
 const DEFAULT_RESOLVER = '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41';
 const FACILITATOR = '0x4020000000000000000000000000000000000001';
 
@@ -47,7 +47,7 @@ const TOOLS = [
       properties: {
         subname: {
           type: 'string',
-          description: 'Target ENSv2 subname (default: oracle.agentcorp.eth)',
+          description: 'Target ENSv2 subname (default: auditor.sentinel402.eth)',
           default: DEFAULT_SUBNAME
         }
       }

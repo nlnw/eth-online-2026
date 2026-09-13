@@ -1,4 +1,4 @@
-# GraphAgent Gateway — 3-Minute Demo Presentation Script
+# Sentinel402 Gateway — 3-Minute Demo Presentation Script
 
 > **Target Hackathon:** ETHOnline 2026  
 > **Target Bounty Tracks:**  
@@ -14,7 +14,7 @@
 2. In the **Demo Studio** toolbar, click **Record Video (.webm)**.
 3. Select this browser tab to capture full 1080p/720p 30fps video.
 4. Follow the verbal script below while clicking the corresponding buttons in the UI.
-5. Click **Stop Recording** — your video file will immediately download to your computer as `graphagent_demo_recording_<timestamp>.webm`.
+5. Click **Stop Recording** — your video file will immediately download to your computer as `sentinel402_demo_recording_<timestamp>.webm`.
 
 ---
 
@@ -22,20 +22,20 @@
 
 ### Stage 1: Introduction & The Core Problem (0:00 – 0:35)
 
-**[Screen: Show the GraphAgent Gateway dashboard at `http://localhost:5173` in Dark Mode]**
+**[Screen: Show the Sentinel402 Gateway dashboard at `http://localhost:5173` in Dark Mode]**
 
-> *"Hi everyone, welcome to our ETHOnline 2026 project: **GraphAgent Gateway**.*
+> *"Hi everyone, welcome to our ETHOnline 2026 project: **Sentinel402 Gateway**.*
 > 
 > *As autonomous AI agents begin managing on-chain capital, they face two critical bottlenecks:*
 > 1. *They need real-time, tamper-proof liquidity and risk data.*
 > 2. *They need a native way to pay for compute and indexing APIs without centralized credit cards or API keys.*
 > 
-> *GraphAgent Gateway solves this by unifying three Web3 pillars:*
+> *Sentinel402 Gateway solves this by unifying three Web3 pillars:*
 > - *The **Bazantic x402 Micropayment Protocol** for autonomous agent paywalls.*
 > - ***The Graph Subgraph Studio** for live DEX liquidity indexing and deterministic cryptographic audits.*
 > - *And **ENSv2 on Ethereum Sepolia** for EAC-permissioned on-chain attestation.*
 > 
-> *Notice our agent identity in the top bar: `oracle.agentcorp.eth`, resolving through our ENSv2 Permissioned Resolver on Sepolia."*
+> *Notice our agent identity in the top bar: `auditor.sentinel402.eth`, resolving through our ENSv2 Permissioned Resolver on Sepolia."*
 
 ---
 
@@ -88,7 +88,7 @@
 > 
 > *In Stage 4, our backend uses `viem` to interact with an **ENSv2 Permissioned Resolver** on Ethereum Sepolia.*
 > 
-> *Under ENSv2's Execution Access Control (EAC), the agent proves authorization for subname `oracle.agentcorp.eth` and executes a `setText` transaction writing `records['last_audit_hash']`.*
+> *Under ENSv2's Execution Access Control (EAC), the agent proves authorization for subname `auditor.sentinel402.eth` and executes a `setText` transaction writing `records['last_audit_hash']`.*
 > 
 > *Here is the resulting Sepolia transaction hash. Anyone on Sepolia can query our resolver contract to verify that the agent's published data matches the on-chain attestation."*
 

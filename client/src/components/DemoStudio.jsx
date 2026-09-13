@@ -113,7 +113,7 @@ export default function DemoStudio({
     },
     {
       title: "4. ENSv2 Permissioned Resolver Attestation",
-      narration: "Using viem on Ethereum Sepolia, the gateway interacts with the ENSv2 Permissioned Resolver contract. Under Execution Access Control (EAC), it commits the audit hash into records['last_audit_hash'] for subname oracle.agentcorp.eth."
+      narration: "Using viem on Ethereum Sepolia, the gateway interacts with the ENSv2 Permissioned Resolver contract. Under Execution Access Control (EAC), it commits the audit hash into records['last_audit_hash'] for subname auditor.sentinel402.eth."
     },
     {
       title: "5. On-Chain Cryptographic Verification",

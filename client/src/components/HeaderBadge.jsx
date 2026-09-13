@@ -39,11 +39,11 @@ export default function HeaderBadge({
         {/* Left: Project identity */}
         <div className="flex items-center gap-3">
           <div className="w-7 h-7 rounded border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center font-mono font-bold text-xs text-zinc-800 dark:text-zinc-200">
-            G
+            S
           </div>
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-              GraphAgent Gateway
+              Sentinel402 Gateway
             </span>
             <span className="text-[10px] font-mono px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
               Sepolia
@@ -57,7 +57,7 @@ export default function HeaderBadge({
             <span className={`w-1.5 h-1.5 rounded-full ${isFunded ? 'bg-emerald-500' : 'bg-amber-500'}`} />
             <span className="text-zinc-500 dark:text-zinc-400">Subname:</span>
             <span className="font-medium text-zinc-900 dark:text-zinc-100">
-              {agentName || 'oracle.agentcorp.eth'}
+              {agentName || 'auditor.sentinel402.eth'}
             </span>
             <span className="text-[10px] text-zinc-500 ml-1">ENSv2 EAC</span>
           </div>

@@ -44,7 +44,7 @@ export default function EacInspector({ attestationData, agentName, resolverAddre
           {/* Architecture comparison */}
           <div className="p-2.5 bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200 dark:border-zinc-800 rounded font-sans text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
             <span className="font-semibold text-zinc-800 dark:text-zinc-200">How ENSv2 is used: </span>
-            In ENSv1, resolvers required full root ownership. ENSv2 introduces <strong>Execution Access Control (EAC)</strong> permissioned resolvers. Our AI agent is granted scoped write permission exclusively for key <code className="font-mono text-zinc-800 dark:text-zinc-200">records['last_audit_hash']</code> under subname <code className="font-mono text-zinc-800 dark:text-zinc-200">{agentName || 'oracle.agentcorp.eth'}</code> without compromising root domain authority.
+            In ENSv1, resolvers required full root ownership. ENSv2 introduces <strong>Execution Access Control (EAC)</strong> permissioned resolvers. Our AI agent is granted scoped write permission exclusively for key <code className="font-mono text-zinc-800 dark:text-zinc-200">records['last_audit_hash']</code> under subname <code className="font-mono text-zinc-800 dark:text-zinc-200">{agentName || 'auditor.sentinel402.eth'}</code> without compromising root domain authority.
           </div>
 
           {/* Decoded Parameters Table */}

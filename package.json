@@ -1,7 +1,7 @@
 {
-  "name": "graphagent-gateway",
+  "name": "sentinel402-gateway",
   "version": "1.0.0",
-  "description": "GraphAgent Gateway - Autonomous Web3 AI Agent Gateway integrating The Graph Subgraph Studio, Bazantic x402 Micropayments, and ENSv2 Permissioned Resolvers",
+  "description": "Sentinel402 Gateway - Autonomous Web3 AI Agent Sentinel integrating The Graph Subgraph Studio, Bazantic x402 Micropayments, and ENSv2 Permissioned Resolvers",
   "type": "module",
   "main": "server/index.js",
   "scripts": {

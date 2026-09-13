@@ -9,7 +9,7 @@ export default function NetworkStatusCard({ agentProfile, onRefresh, lastResult 
   const isFunded = wallet.isFunded || false;
   const balanceEth = wallet.balanceEth || '0.0000';
   const address = agentProfile?.agentAddress || wallet.address || '0x6BB8f6Ca13DfC7f83E568E1080A66bFd81a6aC5f';
-  const subname = agentProfile?.agentName || 'oracle.agentcorp.eth';
+  const subname = agentProfile?.agentName || 'auditor.sentinel402.eth';
   const resolver = agentProfile?.resolverAddress || '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41';
 
   const copyAddress = () => {

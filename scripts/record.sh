@@ -3,7 +3,7 @@ set -e
 
 export PATH="$HOME/.local/share/mise/shims:$PATH"
 
-echo "=== Executing & Recording GraphAgent Flow ==="
+echo "=== Executing & Recording Sentinel402 Flow ==="
 node scripts/record_flow.js
 
 # Generate terminal asciicast recording

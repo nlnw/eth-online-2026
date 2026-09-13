@@ -1,10 +1,10 @@
 {
   "metadata": {
-    "title": "GraphAgent Gateway Audit & Attestation Flow Record",
-    "recordedAt": "2026-09-13T01:16:30.462Z",
+    "title": "Sentinel402 Gateway Audit & Attestation Flow Record",
+    "recordedAt": "2026-09-13T01:19:58.616Z",
     "environment": "Ethereum Sepolia Testnet",
-    "totalDurationMs": 590,
-    "agentSubname": "oracle.agentcorp.eth",
+    "totalDurationMs": 645,
+    "agentSubname": "auditor.sentinel402.eth",
     "agentAddress": "0x6BB8f6Ca13DfC7f83E568E1080A66bFd81a6aC5f",
     "facilitator": "0x4020000000000000000000000000000000000001",
     "resolverAddress": "0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41"
@@ -23,13 +23,13 @@
       "name": "Gateway Health & Identity Handshake",
       "endpoint": "GET /api/health",
       "status": 200,
-      "durationMs": 112,
+      "durationMs": 93,
       "output": {
         "status": "online",
-        "service": "GraphAgent Gateway",
+        "service": "Sentinel402 Gateway",
         "version": "1.0.0",
-        "agentName": "oracle.agentcorp.eth",
-        "subname": "oracle.agentcorp.eth",
+        "agentName": "auditor.sentinel402.eth",
+        "subname": "auditor.sentinel402.eth",
         "agentAddress": "0x6BB8f6Ca13DfC7f83E568E1080A66bFd81a6aC5f",
         "wallet": {
           "hasKey": true,
@@ -46,7 +46,7 @@
           "https://www.alchemy.com/faucets/ethereum-sepolia",
           "https://sepolia-faucet.pk910.de/"
         ],
-        "timestamp": "2026-09-13T01:16:29.972Z"
+        "timestamp": "2026-09-13T01:19:58.053Z"
       }
     },
     {
@@ -54,7 +54,7 @@
       "name": "x402 Micropayment Challenge Enforcement",
       "endpoint": "POST /api/run-audit (No Auth)",
       "status": 402,
-      "durationMs": 24,
+      "durationMs": 14,
       "wwwAuthenticateHeader": "x402 realm=\"bazantic-mpp-gateway\", price=\"0.001 ETH\", facilitator=\"0x4020000000000000000000000000000000000001\"",
       "challenge": {
         "scheme": "x402",
@@ -66,7 +66,7 @@
         "asset": "ETH",
         "network": "sepolia",
         "chainId": 11155111,
-        "nonce": "mpp_nonce_1789262190012_fsmi5qt",
+        "nonce": "mpp_nonce_1789262398080_vh9k1gv",
         "pricingTier": "audit-compute-standard",
         "requiredHeader": "Authorization: Bearer bazantic_mpp_<token>",
         "description": "Bazantic Micropayment Required: 0.001 ETH to execute live Subgraph Studio indexing & ENSv2 Sepolia attestation write"
@@ -77,7 +77,7 @@
       "name": "The Graph Indexing & Deterministic keccak256 Audit",
       "endpoint": "POST /api/run-audit (Bearer Authenticated)",
       "status": 200,
-      "durationMs": 397,
+      "durationMs": 490,
       "graphSource": "The Graph & Uniswap v3 (Live Mainnet Feed)",
       "isGraphLive": true,
       "poolCount": 5,
@@ -87,12 +87,12 @@
     {
       "step": 4,
       "name": "ENSv2 Sepolia Permissioned Resolver Attestation",
-      "subname": "oracle.agentcorp.eth",
+      "subname": "auditor.sentinel402.eth",
       "resolverAddress": "0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41",
       "recordKey": "records['last_audit_hash']",
       "recordValue": "0x94d941929b2b3cad99fa4f615a3863236242985d5f4d9c44abfa026fc2dc21dc",
-      "txHash": "0xeead832dc05c1239e84e2aa108422beb08bbb1ba7733fdf5c5442640c5385a15",
-      "blockNumber": 11693482,
+      "txHash": "0x992396dd6529f272bf275f4f6ed28539d2a1cb48dcd8d1b50a7454283a441549",
+      "blockNumber": 11693144,
       "isSimulated": true
     },
     {
@@ -100,7 +100,7 @@
       "name": "ENSv2 Resolver Record Verification",
       "endpoint": "GET /api/agent-profile",
       "status": 200,
-      "durationMs": 25,
+      "durationMs": 21,
       "recordVerified": true,
       "attestedHash": "0x94d941929b2b3cad99fa4f615a3863236242985d5f4d9c44abfa026fc2dc21dc"
     }

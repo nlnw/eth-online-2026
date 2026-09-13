@@ -70,7 +70,7 @@ export default function AuditSummary({ data }) {
             Attestation State
           </div>
           <div className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 font-mono truncate">
-            {agentName || 'oracle.agentcorp.eth'}
+            {agentName || 'auditor.sentinel402.eth'}
           </div>
           <div className="text-[10px] text-zinc-500 font-mono mt-0.5 flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />

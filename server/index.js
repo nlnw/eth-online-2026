@@ -16,7 +16,7 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 const HOST = process.env.HOST || '0.0.0.0';
 
-const AGENT_SUBNAME = process.env.ENS_AGENT_SUBNAME || 'oracle.agentcorp.eth';
+const AGENT_SUBNAME = process.env.ENS_AGENT_SUBNAME || 'auditor.sentinel402.eth';
 const FACILITATOR_ADDRESS = process.env.X402_FACILITATOR_ADDRESS || '0x4020000000000000000000000000000000000001';
 const RESOLVER_ADDRESS = process.env.ENS_RESOLVER_ADDRESS || '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41';
 
@@ -37,7 +37,7 @@ app.get('/api/health', async (req, res) => {
   const wallet = await getAgentWalletStatus();
   res.json({
     status: 'online',
-    service: 'GraphAgent Gateway',
+    service: 'Sentinel402 Gateway',
     version: '1.0.0',
     agentName: AGENT_SUBNAME,
     subname: AGENT_SUBNAME,
@@ -357,6 +357,6 @@ app.post('/api/run-audit', async (req, res) => {
 });
 
 app.listen(PORT, HOST, () => {
-  console.log(`[GraphAgent Gateway] Server listening on http://${HOST}:${PORT}`);
-  console.log(`[GraphAgent Gateway] Subname: ${AGENT_SUBNAME} | Facilitator: ${FACILITATOR_ADDRESS}`);
+  console.log(`[Sentinel402 Gateway] Server listening on http://${HOST}:${PORT}`);
+  console.log(`[Sentinel402 Gateway] Subname: ${AGENT_SUBNAME} | Facilitator: ${FACILITATOR_ADDRESS}`);
 });

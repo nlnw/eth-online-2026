@@ -1,9 +1,9 @@
 {
   "$schema": "https://bazantic.io/schemas/v1/recipe.json",
-  "name": "graphagent-liquidity-attestation-recipe",
+  "name": "sentinel402-liquidity-attestation-recipe",
   "version": "1.0.0",
   "description": "Bazantic Recipe for autonomous liquidity auditing via The Graph Subgraph Studio, settled via x402 micropayments, and attested to ENSv2 Permissioned Resolvers",
-  "author": "oracle.agentcorp.eth",
+  "author": "auditor.sentinel402.eth",
   "trigger": {
     "type": "on_demand",
     "http": {
@@ -80,7 +80,7 @@
       "parameters": {
         "network": "sepolia",
         "chainId": 11155111,
-        "subname": "oracle.agentcorp.eth",
+        "subname": "auditor.sentinel402.eth",
         "resolver": "0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41",
         "recordKey": "records['last_audit_hash']",
         "recordValue": "${steps.fetch_subgraph_liquidity.outputs.reportHash}",

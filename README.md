@@ -1,4 +1,4 @@
-# GraphAgent Gateway
+# Sentinel402 Gateway
 
 > **ETHOnline 2026 Bounty Submission**
 > 
@@ -34,7 +34,7 @@ flowchart TD
     subgraph ENSv2["3. ENSv2 Permissioned Resolver"]
         ViemClient["Viem Sepolia Client\n(EAC Scoped Authorization)"]
         SepoliaResolver["ENSv2 Resolver (0x4976...Ba41)\nsetText(node, records['last_audit_hash'], hash)"]
-        SubnameNode["Subname: oracle.agentcorp.eth\nnode = namehash(...)"]
+        SubnameNode["Subname: auditor.sentinel402.eth\nnode = namehash(...)"]
     end
 
     UI -->|"POST /api/run-audit"| AuthCheck
@@ -78,7 +78,7 @@ flowchart TD
 
 ### 3. ENS — Best Use of ENSv2 (Sepolia Permissioned Resolver & EAC Subname)
 - **ENSv2 Architecture (`server/src/ens.js`):** Integrates next-generation ENSv2 Permissioned Resolvers on Ethereum Sepolia.
-- **Subname & Node Resolution:** Manages subname `oracle.agentcorp.eth` using `namehash("oracle.agentcorp.eth")` via `viem`.
+- **Subname & Node Resolution:** Manages subname `auditor.sentinel402.eth` using `namehash("auditor.sentinel402.eth")` via `viem`.
 - **EAC Scoped Attestation Write:** Interacts with the Permissioned Resolver (`0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41`) by calling `setText(bytes32 node, string key, string value)` where `key = "records['last_audit_hash']"` and `value = reportHash`.
 - **Simulation & On-Chain Execution:** Executes live Sepolia transactions if private key is supplied; otherwise deterministically computes real ABI calldata, transaction hashes, and block receipts for automated testing and demonstration.
 
@@ -106,7 +106,7 @@ Default parameters in `.env`:
 - `PORT=8080`
 - `THE_GRAPH_SUBGRAPH_URL=https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3`
 - `SEPOLIA_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com`
-- `ENS_AGENT_SUBNAME=oracle.agentcorp.eth`
+- `ENS_AGENT_SUBNAME=auditor.sentinel402.eth`
 - `X402_FACILITATOR_ADDRESS=0x4020000000000000000000000000000000000001`
 
 ### 3. Run Locally

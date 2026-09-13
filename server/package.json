@@ -1,7 +1,7 @@
 {
-  "name": "graphagent-gateway-server",
+  "name": "sentinel402-gateway-server",
   "version": "1.0.0",
-  "description": "Backend execution gateway for GraphAgent: Bazantic x402, Subgraph Studio GraphQL, and ENSv2 Sepolia attestation",
+  "description": "Backend execution gateway for Sentinel402: Bazantic x402, Subgraph Studio GraphQL, and ENSv2 Sepolia attestation",
   "type": "module",
   "main": "index.js",
   "scripts": {
