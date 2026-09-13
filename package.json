@@ -13,6 +13,8 @@
     "play": "uvx asciinema play recordings/demo.cast",
     "generate-wallet": "node scripts/generate_wallet.js",
     "mcp": "node scripts/mcp_server.js",
+    "voiceover": "uv run --with edge-tts python scripts/generate_voiceover.py",
+    "mux": "bash scripts/mux_video.sh",
     "start": "node server/index.js",
     "install:all": "npm install && npm install --prefix client"
   },

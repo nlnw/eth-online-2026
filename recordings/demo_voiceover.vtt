@@ -1,0 +1,92 @@
+1
+00:00:00,100 --> 00:00:07,366
+As autonomous A-I agents take over on-chain trading and data pipelines, they run into two missing primitives.
+
+2
+00:00:07,316 --> 00:00:15,012
+First: how do they pay for specialized micro-services without centralized credit cards or custodial API accounts?
+
+3
+00:00:15,012 --> 00:00:22,696
+And second: how do downstream contracts verify that an agent's audit was actually computed against canonical on-chain state?
+
+4
+00:00:22,696 --> 00:00:25,416
+This is Sentinel four-oh-two Gateway.
+
+5
+00:00:25,416 --> 00:00:35,110
+An autonomous liquidity auditor powered by the x-four-oh-two Micropayment Protocol, The Graph Subgraph Studio, and E-N-S v-two permissioned attestations.
+
+6
+00:00:35,110 --> 00:00:39,877
+Let's see what happens when an unauthorized agent requests an on-demand audit.
+
+7
+00:00:39,877 --> 00:00:49,963
+When we trigger the endpoint without payment, the gateway immediately intercepts the call and returns an R-F-C compliant H-T-T-P four-oh-two Payment Required challenge.
+
+8
+00:00:49,963 --> 00:00:59,693
+Notice the response: it specifies the exact micropayment required — point zero zero one E-T-H — along with the Bazantic facilitator address.
+
+9
+00:00:59,693 --> 00:01:03,333
+No credit cards, no pre-shared secrets.
+
+10
+00:01:03,333 --> 00:01:08,210
+Any autonomous agent can parse this header and settle payment programmatically.
+
+11
+00:01:08,210 --> 00:01:13,419
+Now, we pass a valid Bazantic M-P-P session token and re-execute.
+
+12
+00:01:13,419 --> 00:01:20,539
+The gateway verifies the credential against the facilitator and dispatches Step Two of our declarative Bazantic recipe.
+
+13
+00:01:20,539 --> 00:01:27,585
+Here, Sentinel four-oh-two queries The Graph Subgraph Studio for live mainnet Uniswap v-three pool data.
+
+14
+00:01:27,585 --> 00:01:36,568
+In real time, it indexes total value locked, fee tiers, and volume velocity, calculating a comprehensive liquidity risk score.
+
+15
+00:01:36,568 --> 00:01:48,860
+Most importantly, the agent serializes this state into a canonical payload and computes a deterministic Keccak two-fifty-six report hash, creating a tamper-proof cryptographic fingerprint of the audited liquidity.
+
+16
+00:01:48,860 --> 00:01:52,990
+In Step Three, we lock this audit permanently on-chain.
+
+17
+00:01:52,990 --> 00:02:07,365
+Using E-N-S v-two on Ethereum Sepolia, the agent connects to the official Permissioned Resolver and calls set text, binding the audit hash directly to the subname auditor dot sentinel four-oh-two dot eth, under the key records last audit hash.
+
+18
+00:02:07,365 --> 00:02:17,561
+Any De-Fi protocol or smart contract can now inspect this E-N-S record to verify that liquidity depth was independently validated before routing high-value transactions.
+
+19
+00:02:17,561 --> 00:02:25,134
+For A-I agent developers, Sentinel four-oh-two exposes this entire lifecycle over the Model Context Protocol.
+
+20
+00:02:25,134 --> 00:02:37,205
+Tools like Claude Desktop, Cursor, or autonomous agent frameworks can call audit pool liquidity or get E-N-S attestation natively via standard I-O or H-T-T-P JSON-R-P-C.
+
+21
+00:02:37,205 --> 00:02:47,267
+We've also built an interactive Demo Studio right into the frontend, letting judges replay every stage, inspect raw payloads, and export signed audit runs.
+
+22
+00:02:47,267 --> 00:03:00,257
+Sentinel four-oh-two Gateway brings together machine-payable A-P-Is, real-time decentralized indexing, and verifiable on-chain identity, building the trust layer for the next generation of autonomous on-chain agents.
+
+23
+00:03:00,257 --> 00:03:07,303
+Thank you, and check out the open-source code on GitHub at n-l-n-w slash eth-online-twenty-twenty-six.
+
