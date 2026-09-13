@@ -8,6 +8,7 @@ import ChallengeModal from './components/ChallengeModal';
 import DemoStudio from './components/DemoStudio';
 import EacInspector from './components/EacInspector';
 import NetworkStatusCard from './components/NetworkStatusCard';
+import McpConsole from './components/McpConsole';
 
 const DEFAULT_MPP_TOKEN = 'bazantic_mpp_gateway_session_9a8b7c6d5e4f3a2b1c0d';
 
@@ -460,18 +461,31 @@ export default function App() {
           pools={auditResult ? auditResult.pools : []}
           isLive={auditResult ? auditResult.isGraphLive : true}
         />
+
+        {/* Model Context Protocol (MCP) AI Agent Hub */}
+        <McpConsole
+          agentName={agentProfile?.agentName || 'auditor.sentinel402.eth'}
+          onExportRecording={handleExportRecording}
+          hasAuditRun={Boolean(auditResult)}
+        />
       </main>
 
       {/* Footer */}
       <footer className="border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 py-3 px-4 text-xs font-mono text-zinc-500 transition-colors">
         <div className="max-w-6xl mx-auto px-6 sm:px-10 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>Sentinel402 Gateway • ETHOnline 2026</span>
-          <div className="flex items-center gap-3 text-zinc-400">
-            <span>The Graph Studio</span>
-            <span>•</span>
-            <span>Bazantic x402</span>
-            <span>•</span>
-            <span>ENSv2 Sepolia</span>
+          <span className="font-semibold text-zinc-700 dark:text-zinc-300">Sentinel402 Gateway • ETHOnline 2026</span>
+          <div className="flex flex-wrap items-center gap-2 text-zinc-400">
+            <span className="px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-800 text-[11px] text-zinc-700 dark:text-zinc-300">The Graph Studio</span>
+            <span className="px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-800 text-[11px] text-zinc-700 dark:text-zinc-300">Bazantic x402</span>
+            <span className="px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-800 text-[11px] text-zinc-700 dark:text-zinc-300">ENSv2 Sepolia</span>
+            <a
+              href="https://github.com/nlnw/eth-online-2026"
+              target="_blank"
+              rel="noreferrer"
+              className="text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white underline decoration-zinc-400 font-mono text-[11px]"
+            >
+              github.com/nlnw/eth-online-2026
+            </a>
           </div>
         </div>
       </footer>

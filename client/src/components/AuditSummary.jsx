@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { ExternalLink, Copy, Check } from 'lucide-react';
+import { ExternalLink, Copy, Check, Shield, FileJson, ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function AuditSummary({ data }) {
   const [copiedHash, setCopiedHash] = useState(false);
   const [copiedTx, setCopiedTx] = useState(false);
+  const [showPayload, setShowPayload] = useState(false);
 
   if (!data) return null;
 
-  const { reportHash, txHash, agentName, summary, ensAttestation, recordKey, resolverAddress } = data;
+  const { reportHash, txHash, agentName, summary, ensAttestation, recordKey, resolverAddress, pools } = data;
 
   const copyText = (text, setFn) => {
     navigator.clipboard.writeText(text);
@@ -23,6 +24,18 @@ export default function AuditSummary({ data }) {
       currency: 'USD',
       maximumFractionDigits: 0
     }).format(num);
+  };
+
+  const canonicalPayloadSnippet = {
+    agent: agentName || 'auditor.sentinel402.eth',
+    chainId: 1,
+    subgraph: 'uniswap-v3',
+    totalTvlUSD: summary?.totalTvlUSD,
+    poolsCount: pools?.length || 5,
+    samplePools: (pools || []).slice(0, 2).map((p) => ({
+      pair: `${p.token0?.symbol}/${p.token1?.symbol}`,
+      tvl: p.totalValueLockedUSD || p.tvlUSD
+    }))
   };
 
   return (
@@ -82,8 +95,9 @@ export default function AuditSummary({ data }) {
       {/* Attestation Details Card */}
       <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-md p-3 text-xs shadow-sm space-y-2">
         <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
-          <div className="font-semibold text-zinc-900 dark:text-zinc-100 text-xs">
-            On-Chain Cryptographic Attestation
+          <div className="flex items-center gap-1.5 font-semibold text-zinc-900 dark:text-zinc-100 text-xs">
+            <Shield className="w-3.5 h-3.5 text-emerald-600" />
+            <span>On-Chain Cryptographic Attestation</span>
           </div>
           <div className="text-[11px] text-zinc-500 font-mono">
             Target: <span className="text-zinc-800 dark:text-zinc-200 font-medium">{agentName}</span>
@@ -94,16 +108,26 @@ export default function AuditSummary({ data }) {
           {/* Report Hash */}
           <div className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded p-2.5">
             <div className="flex items-center justify-between text-zinc-500 text-[10px] mb-1">
-              <span>keccak256 Deterministic Report Hash:</span>
-              <button
-                onClick={() => copyText(reportHash, setCopiedHash)}
-                className="hover:text-zinc-900 dark:hover:text-zinc-100 transition flex items-center gap-1"
-              >
-                {copiedHash ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
-                <span>{copiedHash ? 'Copied' : 'Copy'}</span>
-              </button>
+              <span className="font-semibold text-zinc-700 dark:text-zinc-300">keccak256 Deterministic Report Hash:</span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowPayload(!showPayload)}
+                  className="text-[10px] text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 flex items-center gap-0.5"
+                >
+                  <FileJson className="w-3 h-3" />
+                  <span>Payload</span>
+                  {showPayload ? <ChevronUp className="w-2.5 h-2.5" /> : <ChevronDown className="w-2.5 h-2.5" />}
+                </button>
+                <button
+                  onClick={() => copyText(reportHash, setCopiedHash)}
+                  className="hover:text-zinc-900 dark:hover:text-zinc-100 transition flex items-center gap-1"
+                >
+                  {copiedHash ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                  <span>{copiedHash ? 'Copied' : 'Copy'}</span>
+                </button>
+              </div>
             </div>
-            <div className="text-zinc-800 dark:text-zinc-200 break-all text-[11px]">
+            <div className="text-emerald-700 dark:text-emerald-400 font-semibold break-all text-[11px]">
               {reportHash}
             </div>
           </div>
@@ -111,7 +135,7 @@ export default function AuditSummary({ data }) {
           {/* Sepolia Tx Hash */}
           <div className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded p-2.5">
             <div className="flex items-center justify-between text-zinc-500 text-[10px] mb-1">
-              <span>ENSv2 Sepolia Transaction Hash:</span>
+              <span className="font-semibold text-zinc-700 dark:text-zinc-300">ENSv2 Sepolia Transaction Hash:</span>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => copyText(txHash, setCopiedTx)}
@@ -136,6 +160,16 @@ export default function AuditSummary({ data }) {
             </div>
           </div>
         </div>
+
+        {/* Expandable Canonical Payload Preview */}
+        {showPayload && (
+          <div className="p-2.5 bg-zinc-950 text-zinc-300 rounded border border-zinc-800 font-mono text-[10px]">
+            <div className="text-zinc-500 mb-1">Canonical Payload hashed with keccak256():</div>
+            <pre className="overflow-x-auto text-emerald-300">
+              {JSON.stringify(canonicalPayloadSnippet, null, 2)}
+            </pre>
+          </div>
+        )}
 
         {/* Record Key Footer */}
         <div className="flex flex-wrap items-center gap-3 pt-1 text-[11px] font-mono text-zinc-500">

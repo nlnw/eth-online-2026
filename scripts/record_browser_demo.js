@@ -323,51 +323,64 @@ async function run() {
   await injectModernDirectorEffects(page);
   await wait(1000);
 
+  // Initialize synchronized master clock
+  const recordingStartTime = Date.now();
+  async function waitUntilTargetTime(targetSeconds) {
+    const elapsed = (Date.now() - recordingStartTime) / 1000;
+    const remainingMs = Math.round((targetSeconds - elapsed) * 1000);
+    if (remainingMs > 0) {
+      console.log(`  [Sync] Waiting ${(remainingMs / 1000).toFixed(2)}s for voiceover sync at ${targetSeconds}s...`);
+      await wait(remainingMs);
+    }
+  }
+
   // -------------------------------------------------------------------------
-  // SCENE 1: Introduction & The Core Problem (0:00 - 0:31, ~31s)
+  // SCENE 1: Introduction & The Core Problem (0:00 - 0:31.8, ~31.8s)
   // -------------------------------------------------------------------------
   await triggerSceneTransition(page, 'ACT I', 'Autonomous Agent Dilemma & Architecture');
   console.log('[Scene 1] Narration: Intro & Core Problem...');
 
-  // Hover over HeaderBadge elements
-  await smoothMove(page, 'header');
-  await wait(4000);
+  // Hover over Header elements
+  await smoothMove(page, 'header', 16);
+  await wait(3000);
 
   // Hover over agent identity badge
-  await smoothMove(page, 'header .font-mono');
-  await wait(5000);
+  await smoothMove(page, 'header .font-mono', 14);
+  await wait(4000);
 
   // Hover over Hero overview card
-  await smoothMove(page, 'h2:has-text("Sentinel402 Gateway")');
-  await wait(7000);
+  await smoothMove(page, 'h2:has-text("Sentinel402 Gateway")', 16);
+  await wait(6000);
 
   // Hover over network status indicators
-  await smoothMove(page, 'div:has-text("Network Status")');
-  await wait(8000);
+  await smoothMove(page, 'div:has-text("Network Status")', 14);
+  await wait(6000);
+
+  await waitUntilTargetTime(31.8);
 
   // -------------------------------------------------------------------------
-  // SCENE 2: The x402 Micropayment Paywall (0:31 - 1:01, ~30s)
+  // SCENE 2: The x402 Micropayment Paywall (0:31.8 - 1:01.6, ~29.8s)
   // -------------------------------------------------------------------------
   await triggerSceneTransition(page, 'ACT II', 'RFC-Compliant x402 Micropayment Challenge');
   console.log('[Scene 2] Narration: x402 Paywall Challenge...');
 
   // Click "Simulate 402 Paywall"
   await clickElement(page, 'button:has-text("Simulate 402 Paywall")');
-  await wait(1500);
+  await wait(1200);
 
   // Click "Run Bazantic Recipe"
   await clickElement(page, 'button:has-text("Run Bazantic Recipe")');
   console.log('  -> Triggered 402 challenge request');
-  await wait(2500);
+  await wait(2000);
 
-  // The 402 challenge modal should pop up!
+  // The 402 challenge modal pops up
   try {
     await page.waitForSelector('text=HTTP 402 Payment Required', { timeout: 4000 });
     console.log('  -> ChallengeModal visible');
-    await smoothMove(page, 'text=0.001 ETH');
+    await smoothMove(page, 'text=0.001 ETH', 16);
+    await wait(4500);
+    await smoothMove(page, 'text=0x4020000000000000000000000000000000000001', 16);
     await wait(5000);
-    await smoothMove(page, 'text=0x4020000000000000000000000000000000000001');
-    await wait(6000);
 
     // Click button to authenticate and close modal
     await clickElement(page, 'button:has-text("Pass Bazantic MPP Bearer Token")');
@@ -375,121 +388,176 @@ async function run() {
   } catch (_e) {
     console.log('  -> Modal handled or skipped');
   }
-  await wait(4000);
+  await wait(3000);
+
+  await waitUntilTargetTime(61.6);
 
   // -------------------------------------------------------------------------
-  // SCENE 3: Unlocking, Subgraph Indexing & Deterministic Digest (1:01 - 1:40, ~39s)
+  // SCENE 3: Unlocking, Subgraph Indexing & Deterministic Digest (1:01.6 - 1:40.2, ~38.6s)
   // -------------------------------------------------------------------------
   await triggerSceneTransition(page, 'ACT III', 'Decentralized Subgraph Indexing & Keccak256 Hash');
   console.log('[Scene 3] Narration: Subgraph Studio & Keccak256 Digest...');
 
   // Ensure "Authorized (MPP Token)" is selected
   await clickElement(page, 'button:has-text("Authorized (MPP Token)")');
-  await wait(1500);
+  await wait(1000);
 
-  // Click "Run Bazantic Recipe"
+  // Click "Run Bazantic Recipe" to execute authorized flow
   await clickElement(page, 'button:has-text("Run Bazantic Recipe")');
   console.log('  -> Executing full authorized audit pipeline');
-  await wait(4000);
+  await wait(3500);
 
   // Smooth scroll down to Pools Table
-  await smoothScroll(page, 350, 1500);
-  await wait(5000);
+  await smoothScroll(page, 420, 1200);
+  await wait(1000);
 
-  // Hover over pool rows
-  await smoothMove(page, 'table tbody tr:first-child');
-  await wait(5000);
-  await smoothMove(page, 'table tbody tr:nth-child(2)');
-  await wait(5000);
+  // Hover over live indexer status badge
+  await smoothMove(page, 'span:has-text("Uniswap v3 Studio (Live Mainnet)")', 14);
+  await wait(2500);
 
-  // Smooth scroll back up to inspect the computed reportHash
-  await smoothScroll(page, -350, 1200);
-  await wait(2000);
-  await smoothMove(page, 'div:has-text("Deterministic Keccak256 Digest")');
-  await wait(13000);
+  // Click on the first pool row to expand the new Pool Analytics Drawer
+  console.log('  -> Expanding pool analytics drawer (token contracts, verified depth)');
+  await smoothMove(page, 'table tbody tr:first-child', 14);
+  await wait(1200);
+  await clickElement(page, 'table tbody tr:first-child');
+  await wait(1200);
+
+  // Inspect Token 0 & Subgraph on-chain depth
+  await smoothMove(page, 'div:has-text("Token 0 Contract")', 14);
+  await wait(2500);
+  await smoothMove(page, 'div:has-text("Subgraph On-Chain Depth")', 14);
+  await wait(2500);
+
+  // Smooth scroll back up to inspect Audit Summary & computed reportHash
+  await smoothScroll(page, -420, 1200);
+  await wait(1200);
+
+  // Click "Payload" button to reveal the canonical JSON structure hashed with keccak256
+  console.log('  -> Expanding Canonical Keccak-256 Payload Preview');
+  await smoothMove(page, 'button:has-text("Payload")', 14);
+  await wait(800);
+  await clickElement(page, 'button:has-text("Payload")');
+  await wait(1500);
+
+  // Hover over the deterministic report hash and canonical JSON
+  await smoothMove(page, 'span:has-text("keccak256 Deterministic Report Hash")', 14);
+  await wait(2500);
+  await smoothMove(page, 'div:has-text("Canonical Payload hashed with keccak256()")', 14);
+  await wait(2500);
+
+  await waitUntilTargetTime(100.2);
 
   // -------------------------------------------------------------------------
-  // SCENE 4: ENSv2 Permissioned Resolver Attestation (1:40 - 2:07, ~27s)
+  // SCENE 4: ENSv2 Permissioned Resolver Attestation (1:40.2 - 2:07.0, ~26.8s)
   // -------------------------------------------------------------------------
   await triggerSceneTransition(page, 'ACT IV', 'ENSv2 Permissioned Resolver Attestation');
   console.log('[Scene 4] Narration: ENSv2 Permissioned Resolver...');
 
   // Scroll down to EAC Inspector
-  await smoothScroll(page, 220, 1000);
-  await wait(2000);
+  await smoothScroll(page, 280, 1000);
+  await wait(1200);
 
-  // Click to expand EAC Inspector
+  // Click to expand EAC Inspector accordion
   const eacButton = await page.$('button:has-text("ENSv2 Execution Access Control")');
   if (eacButton) {
     await clickElement(page, 'button:has-text("ENSv2 Execution Access Control")');
     console.log('  -> Expanded ENSv2 EAC Inspector accordion');
   }
-  await wait(4000);
+  await wait(2000);
 
   // Hover over the subname and setText details
-  await smoothMove(page, 'text=auditor.sentinel402.eth');
-  await wait(6000);
-  await smoothMove(page, 'text=records[\'last_audit_hash\']');
-  await wait(9000);
+  await smoothMove(page, 'code:has-text("records[\'last_audit_hash\']")', 14);
+  await wait(2500);
+  await smoothMove(page, 'span:has-text("setText(bytes32 node")', 14);
+  await wait(2500);
+
+  // Click "Verify On-Chain Resolver" button to ping Sepolia live!
+  console.log('  -> Clicking Verify On-Chain Resolver button');
+  await clickElement(page, 'button:has-text("Verify On-Chain Resolver")');
+  await wait(2500);
+
+  // Inspect the live verified resolver card
+  await smoothMove(page, 'span:has-text("Live Resolver Record Matched")', 14);
+  await wait(3000);
+  await smoothMove(page, 'span:has-text("Attested Hash")', 14);
+  await wait(3000);
+
+  await waitUntilTargetTime(126.9);
 
   // -------------------------------------------------------------------------
-  // SCENE 5: Model Context Protocol (MCP) & Demo Studio (2:07 - 2:35, ~28s)
+  // SCENE 5: Model Context Protocol (MCP) & Demo Studio (2:07.0 - 2:35.4, ~28.5s)
   // -------------------------------------------------------------------------
   await triggerSceneTransition(page, 'ACT V', 'Model Context Protocol (MCP) & Studio');
   console.log('[Scene 5] Narration: MCP Tools & Demo Studio...');
 
-  // Scroll back to top
-  await smoothScroll(page, -250, 1000);
-  await wait(2000);
+  // Scroll down to MCP Console
+  await smoothScroll(page, 520, 1200);
+  await wait(1200);
 
-  // Click "Recipe Spec" button in header to show Bazantic Recipe
-  const recipeBtn = await page.$('header button:has-text("Recipe Spec")');
-  if (recipeBtn) {
-    await clickElement(page, 'header button:has-text("Recipe Spec")');
-    console.log('  -> Opened Recipe Spec Modal');
-    await wait(5000);
+  // Hover over MCP header
+  await smoothMove(page, 'h3:has-text("Model Context Protocol")', 14);
+  await wait(1500);
 
-    // Close modal cleanly via data-testid or footer button
-    const closeBtn = await page.$('[data-testid="modal-close-btn"]') || await page.$('[data-testid="modal-close-footer-btn"]');
-    if (closeBtn) {
-      await clickElement(page, '[data-testid="modal-close-btn"]');
-    } else {
-      await page.keyboard.press('Escape');
-    }
-    await page.waitForSelector('div[role="dialog"]', { state: 'detached', timeout: 3000 }).catch(() => {});
-    console.log('  -> Closed Recipe Spec Modal');
+  // Expand Claude / Cursor config snippet
+  console.log('  -> Toggling Claude / Cursor Config');
+  await clickElement(page, 'button:has-text("Claude / Cursor Config")');
+  await wait(2500);
+  await clickElement(page, 'button:has-text("Claude / Cursor Config")');
+  await wait(1000);
+
+  // Switch active tool to get_ens_attestation
+  console.log('  -> Selecting get_ens_attestation tool');
+  await clickElement(page, 'button:has-text("get_ens_attestation")');
+  await wait(1500);
+
+  // Simulate live MCP JSON-RPC tool call
+  console.log('  -> Simulating Claude tool call on /api/mcp');
+  await clickElement(page, 'button:has-text("Simulate Claude / Agent Tool Call")');
+  await wait(2500);
+
+  // Hover over the resulting JSON-RPC panels
+  await smoothMove(page, 'span:has-text("JSON-RPC 2.0 Call Succeeded")', 14);
+  await wait(2500);
+  await smoothMove(page, 'span:has-text("Sentinel402 MCP Result")', 14);
+  await wait(2500);
+
+  // Click "Export Signed Run" button
+  console.log('  -> Clicking Export Signed Run');
+  const exportBtn = await page.$('button:has-text("Export Signed Run")');
+  if (exportBtn) {
+    await clickElement(page, 'button:has-text("Export Signed Run")');
   }
   await wait(2000);
 
-  // Click segmented "Light" mode button!
-  console.log('  -> Switching to Light Mode');
-  await clickElement(page, 'header button:has-text("Light")');
-  await wait(4000);
-
-  // Show Light Mode aesthetic
-  await smoothScroll(page, 180, 1000);
-  await wait(3000);
-  await smoothScroll(page, -180, 1000);
-  await wait(2000);
-
-  // Switch back to Dark Mode
-  console.log('  -> Switching back to Dark Mode');
-  await clickElement(page, 'header button:has-text("Dark")');
-  await wait(3000);
+  await waitUntilTargetTime(155.4);
 
   // -------------------------------------------------------------------------
-  // SCENE 6: Conclusion (2:35 - 2:54, ~19s)
+  // SCENE 6: Conclusion (2:35.4 - 2:54.3, ~18.9s)
   // -------------------------------------------------------------------------
   await triggerSceneTransition(page, 'ACT VI', 'Verified Trust Layer for Autonomous DeFi');
   console.log('[Scene 6] Narration: Conclusion & GitHub Repository...');
 
-  // Smoothly hover across the entire interface
-  await smoothMove(page, 'h2:has-text("Sentinel402 Gateway")');
-  await wait(5000);
-  await smoothScroll(page, 200, 1200);
-  await wait(5000);
-  await smoothScroll(page, -200, 1000);
-  await wait(7000);
+  // Scroll down to Footer
+  await smoothScroll(page, 320, 1000);
+  await wait(1200);
+
+  // Hover over sponsor badges
+  await smoothMove(page, 'span:has-text("The Graph Studio")', 14);
+  await wait(2500);
+  await smoothMove(page, 'span:has-text("Bazantic x402")', 14);
+  await wait(2500);
+  await smoothMove(page, 'span:has-text("ENSv2 Sepolia")', 14);
+  await wait(2500);
+
+  // Hover over GitHub repository link
+  await smoothMove(page, 'a:has-text("github.com/nlnw/eth-online-2026")', 14);
+  await wait(3000);
+
+  // Smooth cinematic glide back up to top overview
+  await smoothScroll(page, -800, 1600);
+  await wait(2000);
+
+  await waitUntilTargetTime(174.5);
 
   console.log('[6/7] Finalizing video stream and closing browser...');
   await page.close();
