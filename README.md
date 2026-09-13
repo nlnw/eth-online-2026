@@ -1,104 +1,109 @@
 # Sentinel402 Gateway
 
-> **ETHOnline 2026 Bounty Submission**
-> 
-> Targeting 3 Bounty Tracks:
-> 1. **Bazantic:** Best Recipe using Sponsor APIs (x402/MPP Gateway & Recipe integration)
-> 2. **The Graph:** Best AI Tooling / AI Use Case (From Scratch) (Live Subgraph Studio integration)
-> 3. **ENS:** Best Use of ENSv2 (ENSv2 Sepolia Permissioned Resolver & EAC scoped subname attestation)
+Autonomous on-chain liquidity auditor powered by x402 Micropayments, The Graph indexing, and ENSv2 permissioned attestation.
 
 ---
 
-## System Architecture
+## Overview
+
+Autonomous AI agents executing financial analysis and API operations require two missing primitives:
+1. **Machine-native payment rails:** Trustless pay-per-request monetization without API keys or accounts.
+2. **Verifiable proof of execution:** Tamper-proof, on-chain records proving that an audit was performed against canonical state.
+
+**Sentinel402 Gateway** addresses both. It sits in front of a decentralized liquidity auditing pipeline as an RFC-compliant **x402 Micropayment Protocol (MPP)** gateway. When an autonomous agent requests an audit:
+- The gateway challenges unauthenticated callers with an `HTTP 402 Payment Required` response containing micropayment parameters.
+- Upon receiving valid payment, it queries **The Graph Subgraph Studio** for live Uniswap v3 mainnet liquidity metrics, calculates depth scores and slippage risk, and computes a canonical `keccak256` report hash.
+- It commits this audit digest directly to Ethereum Sepolia using an **ENSv2 Permissioned Resolver** under the subname `auditor.sentinel402.eth`.
+- All operations are also exposed via a native **Model Context Protocol (MCP)** server for LLM tools (Claude, Cursor, Antigravity).
+
+---
+
+## Architecture
 
 ```mermaid
 flowchart TD
-    subgraph Client["Frontend Client (Vite + React + Tailwind)"]
-        UI["Developer Terminal UI\n(Identity & Preset Controls)"]
-        TerminalLog["Real-Time Lifecycle Visualizer\n(Stages 1-4 Logs)"]
-        PoolsTable["Audited Liquidity Data Table\n(TVL, Volume, Risk Rating)"]
+    subgraph Client["Agent / Developer Client"]
+        UI["Developer UI / Demo Studio\n(React + Tailwind + Monospace)"]
+        LLM["LLM Agent\n(Claude / Cursor / Antigravity via MCP)"]
     end
 
-    subgraph BazanticGateway["1. Bazantic x402 Gateway"]
+    subgraph Gateway["1. Bazantic x402 / MPP Gateway"]
         AuthCheck{"Bearer Token\nbazantic_mpp_* ?"}
-        Challenge402["HTTP 402 Payment Required\nWWW-Authenticate x402\n(0.001 ETH challenge)"]
-        SessionPass["Gateway Session Authorized\n(Facilitator 0x4020...0001)"]
+        Challenge402["HTTP 402 Payment Required\nWWW-Authenticate: x402\n(0.001 ETH | Facilitator 0x4020...0001)"]
+        SessionPass["Gateway Session Authorized"]
     end
 
-    subgraph TheGraph["2. The Graph Subgraph Studio"]
+    subgraph Indexer["2. The Graph Subgraph Studio"]
         GraphQLClient["GraphQL Indexer Client\n(fetchSubgraphLiquidity)"]
         UniswapSubgraph["Uniswap v3 Subgraph\n(Pools, TVL, Volume, Fees)"]
-        DeterministicAudit["Deterministic Hash Engine\nkeccak256(normalizedPayload)"]
+        RiskEngine["Risk Engine & Deterministic Digest\nkeccak256(normalizedPayload)"]
     end
 
-    subgraph ENSv2["3. ENSv2 Permissioned Resolver"]
+    subgraph Attestation["3. ENSv2 Permissioned Resolver"]
         ViemClient["Viem Sepolia Client\n(EAC Scoped Authorization)"]
         SepoliaResolver["ENSv2 Resolver (0x4976...Ba41)\nsetText(node, records['last_audit_hash'], hash)"]
         SubnameNode["Subname: auditor.sentinel402.eth\nnode = namehash(...)"]
     end
 
     UI -->|"POST /api/run-audit"| AuthCheck
+    LLM -->|"JSON-RPC / stdio"| AuthCheck
     AuthCheck -- "Missing / Invalid" --> Challenge402
-    Challenge402 -->|"Trigger Challenge Modal"| UI
+    Challenge402 -->|"402 Response"| UI
     AuthCheck -- "Valid MPP Token" --> SessionPass
 
     SessionPass --> GraphQLClient
-    GraphQLClient <-->|"Live GraphQL Query"| UniswapSubgraph
-    GraphQLClient --> DeterministicAudit
-    DeterministicAudit -->|"reportHash: 0x..."| ViemClient
+    GraphQLClient <-->|"GraphQL Query"| UniswapSubgraph
+    GraphQLClient --> RiskEngine
+    RiskEngine -->|"reportHash: 0x..."| ViemClient
 
     ViemClient -->|"setText transaction"| SepoliaResolver
     SepoliaResolver --- SubnameNode
 
     SepoliaResolver -->|"Receipt / txHash"| UI
-    DeterministicAudit -->|"Audited Metrics"| PoolsTable
-    SessionPass -.->|"Progressive Lifecycle"| TerminalLog
+    RiskEngine -->|"Audited Metrics"| UI
 ```
 
 ---
 
-## Bounty Track Integrations
+## Core Capabilities
 
-### 1. Bazantic — Best Recipe using Sponsor APIs (x402/MPP Gateway)
-- **x402 Micropayment Protocol Gateway:** The gateway intercepts all autonomous execution requests at `POST /api/run-audit`. If a client makes an unauthenticated request, the server responds with an RFC-compliant `HTTP 402 Payment Required` challenge containing structured payment details:
-  - `scheme: "x402"`
-  - `realm: "bazantic-mpp-gateway"`
-  - `price: "0.001 ETH"`
-  - `facilitator: "0x4020000000000000000000000000000000000001"`
-- **Declarative Recipe Specification (`/bazantic/recipe.json`):** Formulates a 3-step autonomous pipeline:
-  - **Step 1 (`ingest_gateway_credentials`)**: Ingests and verifies the Bazantic bearer token against the facilitator.
-  - **Step 2 (`fetch_subgraph_liquidity`)**: Dispatches the GraphQL query to Subgraph Studio and computes a deterministic `keccak256` audit hash.
-  - **Step 3 (`ensv2_attestation_write`)**: Writes the attestation to the ENSv2 Permissioned Resolver on Sepolia.
+### 1. x402 Micropayment Protocol Gateway
+- Intercepts requests to `POST /api/run-audit`.
+- Responds to unauthenticated requests with an RFC-compliant `HTTP 402 Payment Required` challenge specifying price (`0.001 ETH`), scheme (`x402`), and facilitator address (`0x4020000000000000000000000000000000000001`).
+- Implements a declarative 3-step pipeline via [`bazantic/recipe.json`](./bazantic/recipe.json).
 
-### 2. The Graph — Best AI Tooling / AI Use Case (Live Subgraph Studio)
-- **Direct GraphQL Integration (`server/src/graph.js`):** Queries live liquidity data for Uniswap v3 pools from The Graph Subgraph Studio and decentralized network.
-- **Liquidity Depth & Slippage Risk Modeling:** Evaluates 24-hour volume against Total Value Locked (velocity ratio), fee tier distribution, and calculates an aggregate liquidity health score (`85-100`).
-- **Deterministic Cryptographic Attestation:** Serializes the normalized audit report and computes a tamper-proof `keccak256` hash (`reportHash`) representing the verified protocol state.
-- **Resilient Fallback Mode:** Provides cached snapshot fallback if network rate-limiting occurs, ensuring continuous 100% test reliability.
+### 2. Live Subgraph Indexing & Deterministic Audit Engine
+- Queries The Graph Subgraph Studio for live Uniswap v3 pool states (`totalValueLockedUSD`, `volumeUSD`, `feeTier`, `liquidity`).
+- Calculates liquidity velocity ratios, depth scores, and slippage risk tiers.
+- Produces a canonical `keccak256` payload hash (`reportHash`) representing the verified protocol snapshot.
 
-### 3. ENS — Best Use of ENSv2 (Sepolia Permissioned Resolver & EAC Subname)
-- **ENSv2 Architecture (`server/src/ens.js`):** Integrates next-generation ENSv2 Permissioned Resolvers on Ethereum Sepolia.
-- **Subname & Node Resolution:** Manages subname `auditor.sentinel402.eth` using `namehash("auditor.sentinel402.eth")` via `viem`.
-- **EAC Scoped Attestation Write:** Interacts with the Permissioned Resolver (`0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41`) by calling `setText(bytes32 node, string key, string value)` where `key = "records['last_audit_hash']"` and `value = reportHash`.
-- **Simulation & On-Chain Execution:** Executes live Sepolia transactions if private key is supplied; otherwise deterministically computes real ABI calldata, transaction hashes, and block receipts for automated testing and demonstration.
+### 3. ENSv2 Permissioned Resolver Attestation
+- Connects to Ethereum Sepolia via Viem.
+- Resolves the subname `auditor.sentinel402.eth` using `namehash`.
+- Invokes `setText(bytes32 node, string key, string value)` on the ENSv2 Permissioned Resolver (`0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41`) with EAC key `records['last_audit_hash']`.
+- Supports live Sepolia on-chain broadcast as well as deterministic simulation for automated CI/CD verification.
+
+### 4. Model Context Protocol (MCP) Server
+- Exposes tools over stdio and HTTP (`POST /api/mcp`):
+  - `audit_pool_liquidity`: Triggers audit pipeline and returns scored metrics + attestation digest.
+  - `get_ens_attestation`: Reads verified audit hash from ENSv2 resolver for any subname.
+  - `get_bazantic_challenge`: Inspects x402 payment specifications and facilitator parameters.
 
 ---
 
-## Quickstart & Local Setup
+## Quickstart
 
 ### Prerequisites
-- Node.js (v18+ or v20+)
+- Node.js v18+ or v20+ (managed via mise or nvm)
 - npm or pnpm
 
 ### 1. Installation
-Install root, backend, and frontend dependencies:
 ```bash
 npm install
 npm install --prefix client
 ```
 
-### 2. Environment Configuration
-Copy the example environment file:
+### 2. Configuration
 ```bash
 cp .env.example .env
 ```
@@ -110,60 +115,53 @@ Default parameters in `.env`:
 - `X402_FACILITATOR_ADDRESS=0x4020000000000000000000000000000000000001`
 
 ### 3. Run Locally
-Run both backend server and frontend client concurrently:
 ```bash
+# Starts Express gateway (port 8080) and Vite frontend (port 5173)
 npm run dev
 ```
-- Frontend: `http://localhost:5173`
-- Backend API: `http://localhost:8080`
+- Web UI: `http://localhost:5173`
+- Gateway API: `http://localhost:8080`
 
-### 4. Model Context Protocol (MCP) Server (The Graph AI Tooling Track)
-Run the native AI Agent MCP server:
+### 4. Run AI Agent MCP Server
 ```bash
 npm run mcp
 ```
-*(Also exposed via HTTP JSON-RPC at `POST /api/mcp`)*
 
-### 5. Automated Flow Execution & Recording
-To run through the complete unauthenticated-to-authenticated lifecycle and record the run:
+### 5. CLI Automated Flow & Recording
 ```bash
-# Run flow and record both JSON audit & asciinema terminal cast
+# Execute end-to-end audit lifecycle and record run JSON + asciinema cast
 npm run record
 
-# Replay recorded terminal cast
+# Replay the recorded CLI cast
 npm run play
 ```
 
-### 6. Generate Sepolia Testnet Keypair (Optional)
-Generate a fresh Ethereum Sepolia keypair and get faucet links:
+### 6. Testnet Keypair Generation (Optional)
 ```bash
 npm run generate-wallet
 ```
 
 ---
 
-## Interactive Demo Walkthrough
+## Targeted Hackathon Tracks
 
-1. **Automated Flow & Record:**
-   - In the frontend top bar or via CLI (`npm run record`), click **Auto-Run Flow**.
-   - The runner tests the HTTP 402 challenge, unlocks via the Bazantic MPP session, runs The Graph query, writes the ENSv2 attestation, and produces an exportable JSON record.
-   - Click **Export Run JSON** to download the signed lifecycle record.
+| Track | Category | Integration Summary |
+|---|---|---|
+| **Bazantic** | Best Recipe using Sponsor APIs | Implements the x402/MPP HTTP 402 paywall gateway and declarative 3-step recipe ([`bazantic/recipe.json`](./bazantic/recipe.json)) governing authentication, indexing, and on-chain settlement. |
+| **The Graph** | Best AI Tooling / AI Use Case (From Scratch) | Uses Subgraph Studio GraphQL to index live Uniswap v3 pool data for automated risk scoring, paired with a full Model Context Protocol (MCP) server for autonomous LLM agent execution. |
+| **ENS** | Best Use of ENSv2 | Integrates next-gen ENSv2 Permissioned Resolvers (`0x4976...Ba41`) on Sepolia, publishing EAC-scoped `records['last_audit_hash']` attestations under `auditor.sentinel402.eth`. |
 
-2. **Test x402 Paywall Challenge:**
-   - Toggle **Gateway Auth** to `Simulate 402 Paywall`.
-   - Click **Run Bazantic Recipe**.
-   - Inspect the **HTTP 402 Payment Required** challenge details.
-   - Click **Pass Bazantic MPP Bearer Token** to re-execute with valid credentials.
+---
 
-3. **Execute Full Lifecycle:**
-   - Set auth to `Authorized (MPP Token)` and click **Run Bazantic Recipe**.
-   - Inspect real-time console events, deterministic report hash, and Sepolia transaction record.
+## API & Endpoints
 
-4. **Light / Dark Mode:**
-   - Click the theme toggle button in the top right to switch between minimal light and dark modes.
-
-3. **Inspect Bazantic Recipe:**
-   - Click **View Bazantic Recipe** in the top header or banner to inspect the declarative schema (`recipe.json`).
+| Method | Endpoint | Description | Auth |
+|---|---|---|---|
+| `GET` | `/api/health` | Gateway status, agent subname, wallet, and network details | None |
+| `POST` | `/api/run-audit` | Executes liquidity audit and writes ENSv2 attestation | `Bearer bazantic_mpp_*` (triggers 402 if missing) |
+| `GET` | `/api/recipe` | Returns the declarative Bazantic recipe schema | None |
+| `GET` | `/api/agent-profile` | Identity, resolver address, and ENS text records | None |
+| `POST` | `/api/mcp` | MCP JSON-RPC protocol endpoint for AI agent tools | None / x402 |
 
 ---
 
@@ -173,32 +171,40 @@ npm run generate-wallet
 .
 ├── bazantic/
 │   ├── recipe.json                 # Declarative Bazantic Recipe definition
-│   └── README.md                   # Bazantic integration details
+│   └── README.md                   # Recipe lifecycle documentation
 ├── client/
 │   ├── src/
 │   │   ├── components/
 │   │   │   ├── AuditSummary.jsx    # Metrics and attestation hash cards
 │   │   │   ├── ChallengeModal.jsx  # HTTP 402 challenge & recipe modal
-│   │   │   ├── HeaderBadge.jsx     # Top identity bar & network status
+│   │   │   ├── DemoStudio.jsx      # Interactive 4-stage walkthrough & recorder
+│   │   │   ├── EacInspector.jsx    # ENSv2 resolver record inspector
+│   │   │   ├── HeaderBadge.jsx     # Identity bar, network status & segmented theme
+│   │   │   ├── NetworkStatusCard.jsx # Live Sepolia & Subgraph node status
 │   │   │   ├── PoolsTable.jsx      # Subgraph audited liquidity table
-│   │   │   └── TerminalLog.jsx     # Developer terminal log visualizer
-│   │   ├── App.jsx                 # Main application coordinator
-│   │   ├── index.css               # Dark theme & monospace styling
+│   │   │   └── TerminalLog.jsx     # Monospace lifecycle console
+│   │   ├── App.jsx                 # Client state coordinator
+│   │   ├── index.css               # Monochrome styling & scrollbars
 │   │   └── main.jsx
 │   ├── index.html
-│   ├── package.json
-│   ├── tailwind.config.js
-│   └── vite.config.js
+│   └── tailwind.config.js
+├── recordings/                     # Generated CLI demo casts and audit run JSONs
+├── scripts/
+│   ├── mcp_server.js               # Model Context Protocol stdio server
+│   ├── record_flow.js              # Automated end-to-end CLI runner
+│   └── generate_wallet.js          # Sepolia keypair generator
 ├── server/
 │   ├── contracts/
 │   │   └── ENSv2PermissionedResolver.json # ABI & Sepolia contract metadata
 │   ├── src/
 │   │   ├── ens.js                  # ENSv2 viem client & setText attestation
 │   │   └── graph.js                # Subgraph Studio GraphQL client & audit hash
-│   ├── index.js                    # Express gateway & x402 middleware
-│   └── package.json
-├── .env.example
-├── .gitignore
-├── package.json
-└── README.md
+│   └── index.js                    # Express gateway & x402 middleware
+└── package.json
 ```
+
+---
+
+## License
+
+MIT
