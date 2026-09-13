@@ -10,7 +10,7 @@
     "dev:client": "npm run dev --prefix client",
     "build": "npm run build --prefix client",
     "record": "bash scripts/record.sh",
-    "record:browser": "node scripts/record_browser_demo.js",
+    "record:browser": "LD_LIBRARY_PATH=\"$HOME/.local/share/mamba/envs/browser-libs/lib:$LD_LIBRARY_PATH\" node scripts/record_browser_demo.js",
     "play": "uvx asciinema play recordings/demo.cast",
     "generate-wallet": "node scripts/generate_wallet.js",
     "mcp": "node scripts/mcp_server.js",

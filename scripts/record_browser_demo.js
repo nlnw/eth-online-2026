@@ -22,6 +22,11 @@ const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(__dirname, '..');
 const VIDEO_DIR = path.join(ROOT_DIR, 'recordings', 'videos');
 
+const USER_LIB_DIR = path.join(process.env.HOME || '/home/ubuntu', '.local/share/mamba/envs/browser-libs/lib');
+if (fs.existsSync(USER_LIB_DIR)) {
+  process.env.LD_LIBRARY_PATH = `${USER_LIB_DIR}:${process.env.LD_LIBRARY_PATH || ''}`;
+}
+
 if (!fs.existsSync(VIDEO_DIR)) {
   fs.mkdirSync(VIDEO_DIR, { recursive: true });
 }
